@@ -4,3 +4,4 @@ Others/
 temp/
 *.exe
 *.bin
+.DS_Store
