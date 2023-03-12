@@ -49,7 +49,7 @@ int main(){
             }
             for(auto j:W[l]){
                 int x=prev(ms[0].lower_bound({Wc[j]+1,-2e9}))->second+Wr[j]+Wc[j];
-                int y=ms[1].lower_bound({Wc[j],0})->second+Wr[j]-Wc[j];
+                int y=ms[1].lower_bound({Wc[j],-2e9})->second+Wr[j]-Wc[j];
                 dp[i&1][j]=min({dp[i&1][j],x,y});
             }
         }
@@ -73,7 +73,7 @@ int main(){
             }
             for(auto j:W[l]){
                 int x=prev(ms[0].lower_bound({Wc[j]+1,-2e9}))->second-Wr[j]+Wc[j];
-                int y=ms[1].lower_bound({Wc[j],0})->second-Wr[j]-Wc[j];
+                int y=ms[1].lower_bound({Wc[j],-2e9})->second-Wr[j]-Wc[j];
                 dp[i&1][j]=min({dp[i&1][j],x,y});
             }
         }
