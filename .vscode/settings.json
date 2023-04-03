@@ -89,6 +89,8 @@
         "sub1": "cpp",
         "cassert": "cpp",
         "rope": "cpp",
-        "slist": "cpp"
+        "slist": "cpp",
+        "ios": "cpp",
+        "queue": "cpp"
     }
 }
