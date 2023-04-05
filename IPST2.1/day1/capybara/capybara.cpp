@@ -83,6 +83,33 @@ struct minsegtree{
 	}
 }sl;
 
+struct segtree{
+	vector<int> t[K];
+	void update(int l,int r,int i,int x,int y,int v){
+		if(y<l||r<x)return;
+		if(x<=l&&r<=y)return void(t[i].emplace_back(v));
+		int m=(l+r)/2;
+		update(l,m,i*2,x,y,v);
+		update(m+1,r,i*2+1,x,y,v);
+	}
+	void update(int x,int y,int v){
+		update(1,n,1,x,y,v);
+	}
+	ll query(int l,int r,int i,int x,int v){
+		if(x<l||r<x)return 1e18;
+		auto it=lower_bound(t[i].begin(),t[i].end(),v);
+		ll res=1e18;
+		if(it!=t[i].end())res=min(res,qs[*it]-qs[v]);
+		if(it!=t[i].begin())res=min(res,qs[v]-qs[*prev(it)]);
+		if(l==r)return res;
+		int m=(l+r)/2;
+		return min({res,query(l,m,i*2,x,v),query(m+1,r,i*2+1,x,v)});
+	}
+	ll query(int x,int v){
+		return query(1,n,1,x,v);
+	}
+}s;
+
 int goleft(int i,ll val){
 	int l=1,r=i;
 	while(l<r){
@@ -117,33 +144,6 @@ pair<int,int> go(int i,ll val){
 	return {resl,resr};
 }
 
-int lg2[N];
-int mn[N][20],mx[N][20];
-
-int rmnq(int l,int r){
-	int sz=lg2[r-l+1];
-	return min(mn[l][sz],mn[r-(1<<sz)+1][sz]);
-}
-
-int rmxq(int l,int r){
-	int sz=lg2[r-l+1];
-	return max(mx[l][sz],mx[r-(1<<sz)+1][sz]);
-}
-
-pair<int,int> gormq(int i,ll val){
-	int l=goleft(i,val);
-	int r=goright(i,val);
-	int resl=l+1,resr=r-1;
-	while(l<resl||resr<r){
-		if(l<1||r>n)break;
-		resl=l;
-		resr=r;
-		r=rmxq(resl,resr);
-		l=rmnq(resl,resr);
-	}
-	return {resl,resr};
-}
-
 void capybara(int N, int Q, vector<int> M, vector<int> K){
 	n=N,q=Q;
 	for(int i=0;i<n;i++){
@@ -165,34 +165,12 @@ void capybara(int N, int Q, vector<int> M, vector<int> K){
 		sl.update(i,lm[i]);
 		sr.update(i,rm[i]);
 	}
-	for(int i=2;i<=n;i++)lg2[i]=lg2[i/2]+1;
-	for(int i=1;i<=n;i++)mn[i][0]=sl.query(i,i);
-	for(int i=1;i<=n;i++)mx[i][0]=sr.query(i,i);
-	for(int i=1;i<20;i++)for(int j=1;j<=n-(1<<i)+1;j++)mn[j][i]=min(mn[j][i-1],mn[j+(1<<(i-1))][i-1]);
-	for(int i=1;i<20;i++)for(int j=1;j<=n-(1<<i)+1;j++)mx[j][i]=max(mx[j][i-1],mx[j+(1<<(i-1))][i-1]);
+	for(int i=1;i<=n;i++)s.update(lm[i],rm[i],i);
 }
 
 mt19937 rng(time(0));
 
 long long travel(int a,int b){
 	a++,b++;
-	if(a==b||(lm[a]<=b&&b<=rm[a]))return m[a];
-	int l=a+1,r=n+1;
-	while(l<r){
-		int mid=(l+r)/2;
-		auto [ql,qr]=gormq(a,qs[mid]-qs[a]);
-		if(ql<=b&&b<=qr)r=mid;
-		else l=mid+1;
-	}
-	ll res=1e18;
-	if(r<=n)res=min(res,qs[l]-qs[a]);
-	l=0,r=a-1;
-	while(l<r){
-		int mid=(l+r+1)/2;
-		auto [ql,qr]=gormq(a,qs[a]-qs[mid]);
-		if(ql<=b&&b<=qr)l=mid;
-		else r=mid-1;
-	}
-	if(1<=l)res=min(res,qs[a]-qs[l]);
-	return res;
+	return max((ll)m[a],s.query(b,a));
 }

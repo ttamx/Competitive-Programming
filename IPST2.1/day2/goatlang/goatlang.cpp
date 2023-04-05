@@ -14,6 +14,7 @@ t3 example2() {
 }
 
 t3 task1(vector<vector<int>> A, int r, int c) {
+	for(auto &v:A)for(auto &x:v)if(x<0)x+=1e9+7;
 	return {A, r, c}; // edit this
 }
 t3 task2(vector<vector<int>> H, int a, int b) {
@@ -31,26 +32,27 @@ t3 task3(vector<int> a) {
 	int d=a.size();
 	while(a.size()<=10)a.emplace_back(0);
 	vector<vector<int>> res(40,vector<int>(40));
-	// 0 -> 1
-	// 2 -> n
-	// 4 -> n^2
+	vector<vector<int>> C(11,vector<int>(11));
+	C[0][0]=1;
+	for(int i=1;i<=10;i++){
+		C[i][0]=C[i][i]=1;
+		for(int j=1;j<i;j++)C[i][j]=C[i-1][j-1]+C[i-1][j];
+	}
+	res[0][39]=a[0];
 	res[0][0]=1;
-	res[0][1]=1;
-	res[1][1]=1;
-	res[1][2]=1;
-	res[0][2]=1;
-	res[2][3]=1;
-	res[3][3]=1;
-	res[3][4]=2;
-	res[2][4]=3;
-	res[0][4]=1;
-	res[0][39]=a[0]+a[1]+a[2];
-	res[2][39]=a[1]+2*a[2];
-	res[4][39]=a[2];
-	res[0][5]=1;
-	res[2][5]=3;
-	res[4][5]=3;
-	res[5][5]=1;
+	for(int i=1;i<=10;i++){
+		int u=i*2-1;
+		res[u][u]=1;
+		for(int j=0;j<i;j++){
+			res[j*2][i*2-1]=C[i][j];
+		}
+		for(int j=0;j<i;j++){
+			res[j*2][u+1]=C[i][j];
+			res[j*2][39]+=a[i]*C[i][j];
+		}
+		res[u][u+1]=1;
+		res[u][39]+=a[i];
+	}
 	return {res,0,39};
 }
 t3 task4() {

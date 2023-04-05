@@ -60,6 +60,11 @@ struct treap{
         return t?t->val:info();
     }
     void upd(pnode t){
+        if(!t)return;
+        pushlz(t->l);
+        pushlz(t->r);
+        flip(t->l);
+        flip(t->r);
         t->sz=sz(t->l)+1+sz(t->r);
         t->val=val(t->l)+info(t->num)+val(t->r);
     }
@@ -170,7 +175,5 @@ int main(){
             cin >> l >> r;
             cout << t.query(l,r) << '\n';
         }
-        t.print(t.rt);
-        cerr << "\n";
     }
 }
