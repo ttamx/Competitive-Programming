@@ -2,6 +2,7 @@ unsorted/
 customprob/
 Others/
 temp/
+teaching/
 *.exe
 *.bin
 .DS_Store
