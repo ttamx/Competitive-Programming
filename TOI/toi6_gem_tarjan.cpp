@@ -19,7 +19,7 @@ void solve(){
         adj[neg[u]].emplace_back(v);
         adj[neg[v]].emplace_back(u);
     }
-    vector<int> disc(m+1),low(m+1);
+    vector<int> disc(m+1),low(m+1),scc(m+1);
     vector<bool> inpath(m+1);
     stack<int> path;
     int idx=0;
@@ -41,12 +41,13 @@ void solve(){
                 t=path.top();
                 path.pop();
                 inpath[t]=false;
+                scc[t]=u;
             }while(t!=u);
         }
     };
     for(int i=1;i<=m;i++)if(!disc[i])tarjan(i);
     char ans='Y';
-    for(int i=1;i<=m;i++)if(low[i]==low[neg[i]])ans='N';
+    for(int i=1;i<=m;i++)if(scc[i]==scc[neg[i]])ans='N';
     cout << ans;
 }
 
