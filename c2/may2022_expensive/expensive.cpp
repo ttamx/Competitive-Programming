@@ -4,39 +4,6 @@
 using namespace std;
 
 typedef long long ll;
-typedef long double ld;
-
-const ld qr=123456789123456789;
-
-struct line{
-	mutable ld m,c,p;
-	line(ld m=0,ld c=0,ld p=0):m(m),c(c),p(p){}
-	bool operator<(const line&o)const{
-		if(o.c==qr)return p<o.p;
-		return m<o.m;
-	}
-};
-
-struct convexhull:multiset<line>{
-	ld inf=1.0/0.0;
-	bool isect(iterator x,iterator y){
-		if(y==end())return x->p=inf,false;
-		if(x->m==y->m)x->p=x->c>=y->c?inf:-inf;
-		else x->p=(x->c-y->c)/(y->m-x->m);
-		return x->p>=y->p;
-	}
-	void add(ld m,ld c){
-		auto x=insert(line(m,c,0)),y=x;
-		while(isect(x,next(x)))erase(next(x));
-		if(x!=begin()&&isect(--x,y))isect(x,erase(y));
-		while((y=x)!=begin()&&(--x)->p>=y->p)isect(x,erase(y));
-	}
-	ld get(ld x){
-		if(empty())return -inf;
-		auto l=*lower_bound(line(0,qr,x));
-		return l.m*x+l.c;
-	}
-}cht;
 
 const int N=1e6+5;
 
@@ -45,6 +12,7 @@ vector<pair<int,int>> adj[N];
 pair<int,int> dp[N];
 int lv[N],pa[N][20];
 vector<int> lf;
+set<pair<int,int>> vec;
 
 void dfs(int u,int p){
 	lv[u]=lv[p]+1;
@@ -86,12 +54,19 @@ void initialize(int N, int Q, vector<pair<int, int>> R,vector<int> C) {
 	for(int i=0;i<lf.size();i++){
 		for(int j=0;j<i;j++){
 			auto [a,b]=calc(lf[i],lf[j]);
-			cht.add(a,b);
+			vec.emplace(a,b);
 		}
+	}
+	int mx=-1;
+	for(auto it=vec.end();it!=vec.begin();){
+		it=prev(it);
+		if(it->second<=mx)it=vec.erase(it);
+		else mx=it->second;
 	}
 }
 
-long long most_expensive(int a, int b) {
-	ld x=1.0*a/b,y=b;
-	return (ll)max((ld)0,cht.get(x)*y);
+long long most_expensive(int x, int y) {
+	ll res=0;
+	for(auto [a,b]:vec)res=max(res,1ll*a*x+1ll*b*y);
+	return res;
 }
