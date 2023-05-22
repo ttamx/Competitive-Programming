@@ -5,7 +5,7 @@ using namespace std;
 const int N=1e5+5;
 
 int n,m,k,q;
-int sz[N],a[N],p[N];
+int a[N],p[N];
 pair<int,int> e[N];
 map<int,int> mp;
 tuple<int,int,int,int> qr[N];
@@ -33,12 +33,10 @@ int main(){
     }
     for(int i=1;i<N;i++){
         if(a[i]){
-            sz[a[i]]++;
-            mp[a[i]];
+            mp[a[i]]++;
         }
     }
     int idx=0;
-    for(auto &[x,y]:mp)y=++idx;
     for(int i=1;i<=m;i++){
         auto &[u,v]=e[i];
         cin >> u >> v;
@@ -52,7 +50,7 @@ int main(){
             cin >> x >> y;
         }
     }
-    for(auto [val,idx]:mp){
+    for(auto &[val,sz]:mp){
         iota(p,p+n+1,0);
         for(int i=1;i<=q;i++){
             auto &[t,x,y,z]=qr[i];
@@ -62,18 +60,20 @@ int main(){
         }
         for(int i=1;i<=m;i++){
             if(cnt[i]==0){
-                uni(e[i].first,e[i].second);
+                auto &[u,v]=e[i];
+                uni(u,v);
             }
         }
         for(int i=q;i>=1;i--){
             auto &[t,x,y,z]=qr[i];
             if(t==1&&y<=val&&val<=z){
                 if(--cnt[x]==0){
-                    uni(e[x].first,e[x].second);
+                    auto &[u,v]=e[x];
+                    uni(u,v);
                 }
             }else{
                 if(fp(x)==fp(y)){
-                    ans[i]+=sz[val];
+                    ans[i]+=sz;
                 }
             }
         }
