@@ -87,5 +87,6 @@
         "valarray": "cpp",
         "variant": "cpp",
         "__bit_reference": "cpp"
-    }
+    },
+    "cph.general.onceMaintainerMessage": false
 }
