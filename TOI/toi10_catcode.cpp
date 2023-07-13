@@ -1,4 +1,5 @@
 #include<bits/stdc++.h>
+#pragma GCC optimize("Ofast")
 
 using namespace std;
 
@@ -8,16 +9,18 @@ const int K=1e5+5;
 int k,m,n;
 int mp[N],mem[N];
 bool vis[K];
+string s;
+int key,idx,d;
+bool tmp;
 
 int main(){
     cin.tie(nullptr)->sync_with_stdio(false);
     cin >> k >> m;
     for(int i=1;i<=k;++i){
-        string s;
         cin >> s;
-        int key=0;
+        key=0;
         for(int j=0;j<m;++j)key=(key<<1)+(s[j]=='1');
-        int idx=key%N;
+        idx=key%N;
         while(mp[idx]!=0)if(++idx==N)idx=0;
         mp[idx]=i;
         mem[idx]=key;
@@ -25,11 +28,10 @@ int main(){
     cin >> n;
     int p=(1<<(m-1))-1;
     while(n--){
-        int d,key=0;
-        string s;
+        key=0;
         cin >> d >> s;
         for(int i=0;i<m-1;++i)key=(key<<1)+(s[i]=='1');
-        bool tmp=true;
+        tmp=true;
         for(int i=m-1;i<d;++i){
             key=(key<<1)+(s[i]=='1');
             int idx=key%N;
