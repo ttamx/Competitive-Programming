@@ -3,17 +3,17 @@
 using namespace std;
 
 void runcase(){
-    int n,m;
     string s;
-    cin >> n >> m;
-    cin >> s;
-    bool ok=false;
-    for(auto x:s){
-        if(!ok&&m+'0'>x)cout << m,ok=true;
-        cout << x;
+    char c;
+    int n;
+    cin >> n >> c >> s;
+    for(int i=0;i<n;i++){
+        if(s[i]<c){
+            cout << s.substr(0,i) << c << s.substr(i,n) << "\n";
+            return;
+        }
     }
-    if(!ok)cout << m;
-    cout << '\n';
+    cout << s << c << "\n";
 }
 
 int main(){
