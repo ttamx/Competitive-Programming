@@ -2,24 +2,28 @@
 
 using namespace std;
 
-const int N=2e5+5;
+typedef pair<int,int> p2;
 
-int n,k1,k2,mxl;
-long long ans;
-bool used[N];
+const int N=1e5+5;
+
+int n,k;
+int c[N];
+vector<int> adj[N];
 int sz[N];
-vector<int> adj[N],dist[N];
+bool used[N];
+vector<p2> add[N];
+int ans[N];
 
 struct fenwick{
-    int f[N];
+    int t[N];
     void add(int i,int v){
         i++;
-        while(i<N)f[i]+=v,i+=i&-i;
+        while(i<N)t[i]+=v,i+=i&-i;
     }
     int read(int i){
         i++;
         int res=0;
-        while(i)res+=f[i],i-=i&-i;
+        while(i>0)res+=t[i],i-=i&-i;
         return res;
     }
 }f;
@@ -36,42 +40,45 @@ int centroid(int u,int cnt,int p=0){
 }
 
 void dfs(int u,int rt,int d=1,int p=0){
-    dist[rt].emplace_back(d);
+    add[rt].emplace_back(d,u);
     for(auto v:adj[u])if(v!=p&&!used[v])dfs(v,rt,d+1,u);
 }
 
 void decom(int u){
     u=centroid(u,dfssz(u));
     used[u]=true;
-    f.add(0,1);
+    f.add(0,c[u]);
     for(auto v:adj[u]){
         if(used[v])continue;
         dfs(v,v);
-        for(auto d:dist[v]){
-            if(k2>=d)ans+=f.read(k2-d);
-            if(k1>=d)ans-=f.read(k1-d);
-        }
-        for(auto d:dist[v])f.add(d,1);
+        for(auto [i,j]:add[v])f.add(i,c[j]);
     }
-    f.add(0,-1);
+    ans[u]+=f.read(k);
     for(auto v:adj[u]){
         if(used[v])continue;
-        for(auto d:dist[v])f.add(d,-1);
-        dist[v].clear();
+        for(auto [i,j]:add[v])f.add(i,-c[j]);
+        for(auto [i,j]:add[v])if(k>=i)ans[j]+=f.read(k-i);
+        for(auto [i,j]:add[v])f.add(i,c[j]);
+    }
+    f.add(0,-c[u]);
+    for(auto v:adj[u]){
+        if(used[v])continue;
+        for(auto [i,j]:add[v])f.add(i,-c[j]);
+        add[v].clear();
     }
     for(auto v:adj[u])if(!used[v])decom(v);
 }
 
 int main(){
     cin.tie(nullptr)->sync_with_stdio(false);
-    cin >> n >> k1 >> k2;
-    k1--;
+    cin >> n >> k;
     for(int i=1;i<n;i++){
         int u,v;
         cin >> u >> v;
         adj[u].emplace_back(v);
         adj[v].emplace_back(u);
     }
+    for(int i=1;i<=n;i++)cin >> c[i];
     decom(1);
-    cout << ans;
+    for(int i=1;i<=n;i++)cout << ans[i] << "\n";
 }
