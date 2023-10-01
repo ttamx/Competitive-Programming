@@ -92,5 +92,6 @@
         "slist": "cpp",
         "ios": "cpp",
         "queue": "cpp"
-    }
+    },
+    "cph.general.onceMaintainerMessage": false
 }

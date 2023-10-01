@@ -7,8 +7,8 @@ const int N=2e5+5;
 int n,k1,k2,mxl;
 long long ans;
 bool used[N];
-int sz[N],cnt[N];
-vector<int> adj[N];
+int sz[N];
+vector<int> adj[N],dist[N];
 
 struct fenwick{
     int f[N];
@@ -17,75 +17,61 @@ struct fenwick{
         while(i<N)f[i]+=v,i+=i&-i;
     }
     int read(int i){
-        int res=0;
         i++;
+        int res=0;
         while(i)res+=f[i],i-=i&-i;
         return res;
     }
 }f;
 
-void dfs(int u,int p){
+int dfssz(int u,int p=0){
     sz[u]=1;
-    for(auto v:adj[u]){
-        if(v==p||used[v])continue;
-        dfs(v,u);
-        sz[u]+=sz[v];
-    }
+    for(auto v:adj[u])if(v!=p&&!used[v])sz[u]+=dfssz(v,u);
+    return sz[u];
 }
 
-void dfsans(int u,int p,int l){
-    if(l>k2)return;
-    ans+=f.read(k2-l)-f.read(max(-1,k1-l-1));
-    mxl=max(mxl,l);
-    for(auto v:adj[u]){
-        if(v==p||used[v])continue;
-        dfsans(v,u,l+1);
-    }
-}
-
-void dfscnt(int u,int p,int l){
-    if(l>k2)return;
-    f.add(l,1);
-    cnt[l]++;
-    mxl=max(mxl,l);
-    for(auto v:adj[u]){
-        if(v==p||used[v])continue;
-        dfscnt(v,u,l+1);
-    }
-}
-
-int centroid(int u,int p,int cnt){
-    for(auto v:adj[u]){
-        if(v==p||used[v])continue;
-        if(sz[v]*2>cnt)return centroid(v,u,cnt);
-    }
+int centroid(int u,int cnt,int p=0){
+    for(auto v:adj[u])if(v!=p&&!used[v]&&sz[v]*2>cnt)return centroid(v,cnt,u);
     return u;
 }
 
-void sol(int u){
-    dfs(u,-1);
-    u=centroid(u,-1,sz[u]);
+void dfs(int u,int rt,int d=1,int p=0){
+    dist[rt].emplace_back(d);
+    for(auto v:adj[u])if(v!=p&&!used[v])dfs(v,rt,d+1,u);
+}
+
+void decom(int u){
+    u=centroid(u,dfssz(u));
     used[u]=true;
-    mxl=0;
+    f.add(0,1);
     for(auto v:adj[u]){
         if(used[v])continue;
-        dfsans(v,u,1);
-        dfscnt(v,u,1);
+        dfs(v,v);
+        for(auto d:dist[v]){
+            if(k2>=d)ans+=f.read(k2-d);
+            if(k1>=d)ans-=f.read(k1-d);
+        }
+        for(auto d:dist[v])f.add(d,1);
     }
-    for(int i=1;i<=mxl;i++)f.add(i,-cnt[i]),cnt[i]=0;
-    for(auto v:adj[u])if(!used[v])sol(v);
+    f.add(0,-1);
+    for(auto v:adj[u]){
+        if(used[v])continue;
+        for(auto d:dist[v])f.add(d,-1);
+        dist[v].clear();
+    }
+    for(auto v:adj[u])if(!used[v])decom(v);
 }
 
 int main(){
     cin.tie(nullptr)->sync_with_stdio(false);
     cin >> n >> k1 >> k2;
+    k1--;
     for(int i=1;i<n;i++){
         int u,v;
         cin >> u >> v;
-        adj[u].push_back(v);
-        adj[v].push_back(u);
+        adj[u].emplace_back(v);
+        adj[v].emplace_back(u);
     }
-    f.add(0,1);
-    sol(1);
+    decom(1);
     cout << ans;
 }
