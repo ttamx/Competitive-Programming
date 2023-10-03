@@ -1,0 +1,1 @@
+void send(int a);
