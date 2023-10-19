@@ -86,7 +86,8 @@
         "typeinfo": "cpp",
         "valarray": "cpp",
         "variant": "cpp",
-        "__bit_reference": "cpp"
+        "__bit_reference": "cpp",
+        "ios": "cpp"
     },
     "cph.general.onceMaintainerMessage": false
 }

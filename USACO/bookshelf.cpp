@@ -1,18 +1,22 @@
 #include<bits/stdc++.h>
- 
+
 using namespace std;
- 
+
 typedef long long ll;
- 
-void runcase(){
-    int n,m;
+
+const int N=1e5+5;
+
+int n,m;
+int h[N];
+ll w[N];
+deque<int> dq;
+multiset<ll> ms;
+ll dp[N];
+
+int main(){
+    cin.tie(nullptr)->sync_with_stdio(false);
     cin >> n >> m;
-    vector<int> h(n+2);
-    vector<ll> w(n+2),dp(n+2);
-    deque<int> dq;
-    multiset<ll> ms;
-    for(int i=1;i<=n;i++)cin >> w[i];
-    for(int i=1;i<=n;i++)cin >> h[i];
+    for(int i=1;i<=n;i++)cin >> h[i] >> w[i];
     for(int i=1;i<=n;i++)w[i]+=w[i-1];
     dq.emplace_back(0);
     for(int i=1;i<=n;i++){
@@ -33,12 +37,5 @@ void runcase(){
         }
         dp[i]=*ms.begin();
     }
-    cout << dp[n] << "\n";
-}
- 
-int main(){
-    cin.tie(nullptr)->sync_with_stdio(false);
-    int t;
-    cin >> t;
-    while(t--)runcase();   
+    cout << dp[n];
 }
