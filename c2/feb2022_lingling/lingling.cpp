@@ -21,23 +21,23 @@ ll dp[K][K],cnt[K][N];
 int hsh[N],qs1[N],qs2[N];
 
 struct fenwick{
-  int t[N];
-  void add(int i,int v){	
-    while(i<N)t[i]+=v,i+=i&-i;
-  }
-  int read(int i){
-    int ret=0;
-    while(i>0)ret+=t[i],i-=i&-i;
-    return ret;
-  }
+	int t[N];
+	void add(int i,int v){	
+		while(i<N)t[i]+=v,i+=i&-i;
+	}
+	int read(int i){
+		int res=0;
+		while(i>0)res+=t[i],i-=i&-i;
+		return res;
+	}
 }f;
 
 ll calc(vector<int> &l,vector<int> &r){
 	ll res=0;
-	int i=0,j=0;
-	while(i<l.size()&&j<r.size()){
-		if(l[i]<r[j])i++;
-		else res+=l.size()-i,j++;
+	int p=0;
+	for(auto x:l){
+		while(p<r.size()&&x>r[p])p++;
+		res+=p;
 	}
 	return res;
 }

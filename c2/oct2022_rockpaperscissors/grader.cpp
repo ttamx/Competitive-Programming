@@ -1,24 +1,20 @@
-#include "rockpaperscissors.h"
-#include <cassert>
-#include <cstdio>
-#include <vector>
-#include <set>
+#include "rockpaperscissors.cpp"
+#include <bits/stdc++.h>
 using namespace std;
 int n,t;
 vector<int>person;
 int tournament_call = 0, tournament_cost = 0;
 
 void invalid_input(){
-  printf("invalid_input!!!");
-  cerr << "\n";
+  printf("invalid_input!!!\n");
 }
 
 int tournament(std::vector<int>person_index){
   int count_rps[] = {0,0,0,0}, max_win = 0,num_person = 0;
   std::set<int>same_index_check;
+  for(auto x:person_index)cerr << x << " ";
   for(int i=0;i<person_index.size();i++){
     if(person_index[i] < 0 || person_index[i] > 3*n){
-      for(auto x:person_index)cerr << x << " ";
       invalid_input();
       return -1;
     }
@@ -27,12 +23,10 @@ int tournament(std::vector<int>person_index){
     num_person++;
   }
   if(same_index_check.size() != person_index.size()){
-      for(auto x:person_index)cerr << x << " ";
     invalid_input();
     return -1;
   }
   if(same_index_check.size()<3){
-      for(auto x:person_index)cerr << x << " ";
     invalid_input();
     return -1;
   }
@@ -42,6 +36,7 @@ int tournament(std::vector<int>person_index){
   if(count_rps[1] >= 1)max_win = std::max(max_win, count_rps[3]);
   if(count_rps[2] >= 1)max_win = std::max(max_win, count_rps[1]);
   if(count_rps[3] >= 1)max_win = std::max(max_win, count_rps[2]);
+  cerr << ": " << max_win << "\n";
   return max_win;
 }
 
@@ -108,7 +103,7 @@ int main(){
         return 0;
       }
       ans_cheater=find_cheater2(n);
-      cerr << ans_cheater;
+      cerr << ans_cheater << "\n";
       if(ans_cheater != cheater_position)printf("Wrong Answer\n");
       else printf("Correct Answer: Your total tournament cost is %d.\n",tournament_cost);
     }

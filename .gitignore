@@ -5,4 +5,5 @@ temp/
 teaching/
 *.exe
 *.bin
+*.o
 .DS_Store

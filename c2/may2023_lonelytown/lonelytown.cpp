@@ -3,13 +3,12 @@
 
 using namespace std;
 
-mt19937 rng(time(nullptr));
-
 typedef pair<int,int> p2;
 typedef tuple<int,int,int> t3;
 
 const int N=1e5+5;
 const int K=1<<18;
+const int inf=1e9;
 
 int n,q;
 int a[N];
@@ -56,7 +55,7 @@ struct segtree{
     }
     p2 query(int l,int r,int i,int &x,int &y){
         pushlz(l,r,i);
-        if(y<l||r<x)return {INT_MAX,0};
+        if(y<l||r<x)return p2(inf,0);
         if(x<=l&&r<=y)return t[i];
         int m=(l+r)/2;
         return merge(query(l,m,i*2,x,y),query(m+1,r,i*2+1,x,y));
@@ -69,7 +68,7 @@ struct segtree{
 struct minsegtree{
     int t[K];
     void build(int l,int r,int i){
-        if(l==r)return void(t[i]=INT_MAX);
+        if(l==r)return void(t[i]=inf);
         int m=(l+r)/2;
         build(l,m,i*2);
         build(m+1,r,i*2+1);
@@ -95,21 +94,21 @@ struct minsegtree{
         return t[i*2]<=v?findelement(l,m,i*2,v):findelement(m+1,r,i*2+1,v);
     }
     t3 findsegment(int l,int r,int i,int x,int v){
-        if(r<x)return t3(INT_MAX,0,0);
-        if(x<=l)return t[i]<=v?t3(l,r,i):t3(INT_MAX,0,0);
+        if(r<x)return t3(inf,0,0);
+        if(x<=l)return t[i]<=v?t3(l,r,i):t3(inf,0,0);
         int m=(l+r)/2;
         return min(findsegment(l,m,i*2,x,v),findsegment(m+1,r,i*2+1,x,v));
     }
     int find(int x,int v){
         auto [l,r,i]=findsegment(1,n,1,x,v);
-        return l==INT_MAX?n+1:findelement(l,r,i,v);
+        return l==inf?n+1:findelement(l,r,i,v);
     }
 }sl;
 
 struct maxsegtree{
     int t[K];
     void build(int l,int r,int i){
-        if(l==r)return void(t[i]=INT_MIN);
+        if(l==r)return void(t[i]=-inf);
         int m=(l+r)/2;
         build(l,m,i*2);
         build(m+1,r,i*2+1);
@@ -135,14 +134,14 @@ struct maxsegtree{
         return t[i*2+1]>=v?findelement(m+1,r,i*2+1,v):findelement(l,m,i*2,v);
     }
     t3 findsegment(int l,int r,int i,int x,int v){
-        if(x<l)return t3(INT_MIN,0,0);
-        if(r<=x)return t[i]>=v?t3(l,r,i):t3(INT_MIN,0,0);
+        if(x<l)return t3(-inf,0,0);
+        if(r<=x)return t[i]>=v?t3(l,r,i):t3(-inf,0,0);
         int m=(l+r)/2;
         return max(findsegment(l,m,i*2,x,v),findsegment(m+1,r,i*2+1,x,v));
     }
     int find(int x,int v){
         auto [l,r,i]=findsegment(1,n,1,x,v);
-        return l==INT_MIN?0:findelement(l,r,i,v);
+        return l==-inf?0:findelement(l,r,i,v);
     }
 }sr;
 
@@ -183,8 +182,8 @@ void deledge(int l,int r){
 void init_town(int N, int Q, vector<int> u, vector<int> v) {
     n=N,q=Q;
     for(int i=1;i<=n;i++){
-        msl[i].emplace(INT_MAX);
-        msr[i].emplace(INT_MIN);
+        msl[i].emplace(inf);
+        msr[i].emplace(-inf);
     }
     s.build();
     sl.build();
