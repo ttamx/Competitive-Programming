@@ -2,69 +2,58 @@
 
 using namespace std;
 
-typedef long long ll;
+typedef pair<int,int> p2;
 
 const int N=1e5+5;
+const int inf=1e9;
 
-int n;
-ll k;
-vector<pair<int,ll>> adj[N];
-set<ll> s;
-int sz[N],cp[N];
+int n,k;
+vector<p2> adj[N];
+int sz[N];
 bool used[N];
-ll ans=1e18;
+int ans=inf;
+vector<int> vec;
 
-void sol(int u,int p,bool add,ll d){
-    if(add){
-        s.emplace(d);
-    }else{
-        auto it=s.lower_bound(k-d);
-        if(it!=s.end()){
-            ans=min(ans,llabs(*it+d-k));
-        }
-        if(it!=s.begin()){
-            ans=min(ans,llabs(d+*prev(it)-k));
-        }
-    }
-    for(auto [v,w]:adj[u]){
-        if(v==p||used[v])continue;
-        sol(v,u,add,d+w);
-    }
-}
-
-int dfs(int u,int p=0){
+int dfssz(int u,int p=-1){
     sz[u]=1;
-    for(auto [v,w]:adj[u]){
-        if(v==p||used[v])continue;
-        sz[u]+=dfs(v,u);
-    }
+    for(auto [v,w]:adj[u])if(v!=p&&!used[v])sz[u]+=dfssz(v,u);
     return sz[u];
 }
 
-int centroid(int u,int req,int p=0){
-    for(auto [v,w]:adj[u])if(sz[v]*2>req&&!used[v]&&v!=p)return centroid(v,req,u);
+int centroid(int u,int cnt,int p=-1){
+    for(auto [v,w]:adj[u])if(v!=p&&!used[v]&&sz[v]>cnt/2)return centroid(v,cnt,u);
     return u;
 }
 
-void decom(int u,int p=0){
-    u=centroid(u,dfs(u));
+void dfs(int u,int d,int p=-1){
+    vec.emplace_back(d);
+    if(d>k)return;
+    for(auto [v,w]:adj[u])if(v!=p&&!used[v])dfs(v,d+w,u);
+}
+
+void decom(int u){
+    u=centroid(u,dfssz(u));
     used[u]=true;
-    cp[u]=p;
-    s.clear();
+    set<int> s;
     s.emplace(0);
-    for(auto [v,w]:adj[u]){
-        sol(v,u,0,w);
-        sol(v,u,1,w);
+    for(auto [v,w]:adj[u])if(!used[v]){
+        dfs(v,w);
+        for(auto d:vec){
+            auto it=s.lower_bound(k-d);
+            if(it!=s.end())ans=min(ans,*it+d-k);
+            if(it!=s.begin())ans=min(ans,k-*prev(it)-d);
+        }
+        for(auto d:vec)s.emplace(d);
+        vec.clear();
     }
-    for(auto [v,w]:adj[u])if(!used[v])decom(v,u);
+    for(auto [v,w]:adj[u])if(!used[v])decom(v);
 }
 
 int main(){
     cin.tie(nullptr)->sync_with_stdio(false);
     cin >> n >> k;
     for(int i=1;i<n;i++){
-        int u,v;
-        ll w;
+        int u,v,w;
         cin >> u >> v >> w;
         adj[u].emplace_back(v,w);
         adj[v].emplace_back(u,w);

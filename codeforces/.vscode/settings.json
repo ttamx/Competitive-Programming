@@ -87,7 +87,10 @@
         "valarray": "cpp",
         "variant": "cpp",
         "__bit_reference": "cpp",
-        "ios": "cpp"
+        "ios": "cpp",
+        "queue": "cpp",
+        "stack": "cpp",
+        "__split_buffer": "cpp"
     },
     "cph.general.onceMaintainerMessage": false
 }
