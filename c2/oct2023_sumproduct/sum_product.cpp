@@ -5,17 +5,18 @@ using namespace std;
 
 typedef long long ll;
 
+const int N=1e5+5;
 const ll mod=1e9+7;
-const ll inv=5e8+4;
+
+ll pw[N];
 
 int sum_product(int n, vector<int> a){
-	ll ans=0,sum=0,pw=1,pw2=1;
-	for(int i=0;i<n-1;i++)pw2=pw2*2%mod;
+	pw[0]=1;
+	for(int i=1;i<=n;i++)pw[i]=pw[i-1]*2%mod;
+	ll ans=0,sum=0;
 	for(int i=0;i<n;i++){
-		sum=(sum+pw)*a[i]%mod;
-		if(i>0)pw=pw*2%mod;
-		if(i<n-1)pw2=pw2*inv%mod;
-		ans=(ans+sum*pw2)%mod;
+		sum=(sum+pw[max(i-1,0)])*a[i]%mod;
+		ans=(ans+sum*pw[max(n-i-2,0)])%mod;
 	}
 	return ans;
 }

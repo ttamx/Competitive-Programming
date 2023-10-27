@@ -1,4 +1,4 @@
-#include "inversion.h"
+#include "inversion.cpp"
 #include <algorithm>
 #include <cassert>
 #include <iostream>

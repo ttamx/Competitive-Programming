@@ -1,16 +1,16 @@
 #include<stdio.h>
-#include "tnt.h"
+#include "tnt.cpp"
 #include<vector>
 #include<algorithm>
 #include <assert.h>
-static int times,A,B,N,Q;
+static int times,A,B,NN,Q;
 
 bool find_tnt(std::vector<int>city)
 {
     std::sort(city.begin(),city.end());
     for(int i = 0;i < city.size();i++)
     {
-        if(city[i]<0 || city[i]>=N)
+        if(city[i]<0 || city[i]>=NN)
         {
             printf("City out of range\n");
             exit(-1);
@@ -29,15 +29,15 @@ bool find_tnt(std::vector<int>city)
     times++;
     bool find=false;
     for(int i = 0;i < city.size();i++)
-      if((A + B*times)%N==city[i])find=true;
+      if((A + B*times)%NN==city[i])find=true;
     return find;
 }
 
 int main()
 {
   times=0;
-  assert(scanf("%d %d %d %d",&N,&Q,&A,&B)==4);
-  std::vector<int>sol=find_truck(N);
+  assert(scanf("%d %d %d %d",&NN,&Q,&A,&B)==4);
+  std::vector<int>sol=find_truck(NN);
     if(sol[0]==A && sol[1]==B)
       printf("Pass\n");
     else {
