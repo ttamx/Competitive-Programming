@@ -108,7 +108,13 @@
         "__tree": "cpp",
         "__tuple": "cpp",
         "locale": "cpp",
-        "stack": "cpp"
+        "stack": "cpp",
+        "expected": "cpp",
+        "format": "cpp",
+        "spanstream": "cpp",
+        "stacktrace": "cpp",
+        "stdfloat": "cpp",
+        "filesystem": "cpp"
     },
     "cph.general.onceMaintainerMessage": false
 }

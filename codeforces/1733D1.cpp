@@ -18,21 +18,7 @@ void runcase(){
         cout << min(y*2ll,x) << '\n';
         return;
     }
-    if(x>=y){
-        cout << y*(long long)(v.size()/2) << '\n';
-    }else{
-        long long ans=0;
-        int l=0,r=v.size()-1;
-        while(l<r){
-            if((v[r]-v[l])*x<y){
-                ans+=x*(v[r]-v[l]);
-            }else{
-                ans+=y;
-            }
-            l++,r--;
-        }
-        cout << ans << '\n';
-    }
+    cout << y*(long long)(v.size()/2) << '\n';
 }
 
 int main(){
