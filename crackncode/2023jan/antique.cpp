@@ -1,18 +1,21 @@
 #include<bits/stdc++.h>
-#include<bits/extc++.h>
-
+#include <ext/pb_ds/assoc_container.hpp>
+ 
 using namespace std;
 using namespace __gnu_pbds;
-
+ 
+typedef pair<int,int> p2;
+ 
 const bool DBG=false;
 const int N=2e5+5;
 const int K=1e4+5;
-
+const int M=1e8+5;
+ 
 int n,k,A,B;
 map<int,int> mp;
 gp_hash_table<int,int> mp2;
 set<int> num;
-
+ 
 int main(){
     cin.tie(nullptr)->sync_with_stdio(false);
     cin >> n >> k >> A >> B;
@@ -36,7 +39,7 @@ int main(){
                 for(int j=0;j<10;j++){
                     if(mp2[b/p*10+j]==0)continue;
                     if((i*j)%k!=a)continue;
-                    cnt=max(cnt,mp2[p*10+i]+mp2[{b/p*10+j}]);
+                    cnt=max(cnt,mp2[p*10+i]+mp2[b/p*10+j]);
                 }
             }
         }

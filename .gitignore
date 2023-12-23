@@ -1,3 +1,6 @@
+*
+!*/
+!*.*
 unsorted/
 customprob/
 Others/
@@ -5,5 +8,6 @@ temp/
 teaching/
 *.exe
 *.bin
+*.o
 .DS_Store
 .vscode/

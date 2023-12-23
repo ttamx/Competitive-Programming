@@ -1,4 +1,4 @@
-#include "askask.cpp"
+#include "askask.h"
 #include <vector>
 #include <iostream>
 #include <algorithm>
@@ -41,10 +41,7 @@ std::vector<bool> analyse(std::vector<std::vector<int>> Z){
 
 int main(){
   std::ios::sync_with_stdio(false);
-  for(int i=0;i<200;++i){
-  n=64;
-  x_1=rand()%64;
-  x_2=rand()%64;
+  std::cin >> n >> x_1 >> x_2;
   if(x_1 > x_2) std::swap(x_1, x_2);
   std::vector<int> output = find_bombs(n);
   if(output.size() != 2){
@@ -56,6 +53,5 @@ int main(){
     exit(0);
   }
   std::cout << "Correct Answer: " << q << std::endl;
-  }
   return 0;
 }
