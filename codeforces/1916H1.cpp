@@ -1,7 +1,6 @@
 #include<bits/stdc++.h>
 #define sz(x) (int)(x).size()
 #define all(x) (x).begin(),(x).end()
-#define rall(x) (x).rbegin(),(x).rend()
 
 using namespace std;
 
@@ -14,8 +13,8 @@ using pii = pair<int,int>;
 using pll = pair<ll,ll>;
 using pdd = pair<db,db>;
 const int INF=0x3fffffff;
-const int MOD=1000000007;
-// const int MOD=998244353;
+// const int MOD=1000000007;
+const int MOD=998244353;
 const ll LINF=0x1fffffffffffffff;
 const db DINF=numeric_limits<db>::infinity();
 const db EPS=1e-9;
@@ -57,50 +56,20 @@ mint invmod(int x){
     return invs[x];
 }
 
-struct Combinatorics{
-    int n;
-    vm fac,invfac;
-    Combinatorics(){
-        n=0;
-        fac=invfac={1};
-    }
-    void init(int _n){
-        if(n>=_n)return;
-        fac.resize(_n+1);
-        invfac.resize(_n+1);
-        for(int i=n+1;i<=_n;i++)fac[i]=fac[i-1]*i;
-        invfac[_n]=fac[_n].inv();
-        for(int i=_n;i>n+1;i--)invfac[i-1]=invfac[i]*i;
-        n=_n;
-    }
-    mint C(int n,int r){
-        if(n<0||r<0||n<r)return 0;
-        return fac[n]*invfac[n-r]*invfac[r];
-    }
-}combi;
-
 int main(){
     cin.tie(nullptr)->sync_with_stdio(false);
-    int n,k;
-    cin >> n >> k;
-    vector<vi> adj(n);
-    for(int i=1;i<n;i++){
-        int u,v;
-        cin >> u >> v;
-        u--,v--;
-        adj[u].emplace_back(v);
-        adj[v].emplace_back(u);
+    ll n,k;
+    mint q;
+    cin >> n >> q >> k;
+    mint ans=1;
+    mint qn=binpow(q,n),qr=1;
+    mint inv=q.inv(),qn2=qn;
+    for(int r=0;r<=k;r++){
+        cout << ans << " ";
+        ans*=qn-qr;
+        qr*=q;
+        ans*=1-qn2;
+        ans/=1-qr;
+        qn2*=inv;
     }
-    if(k&1)cout << 1,exit(0);
-    combi.init(n);
-    mint tot=combi.C(n,k);
-    mint ans=tot;
-    function<int(int,int)> dfs=[&](int u,int p){
-        int sz=1;
-        for(auto v:adj[u])if(v!=p)sz+=dfs(v,u);
-        ans+=combi.C(sz,k/2)*combi.C(n-sz,k/2);
-        return sz;
-    };
-    dfs(0,-1);
-    cout << ans/tot << "\n";
 }

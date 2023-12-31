@@ -1,7 +1,6 @@
 #include<bits/stdc++.h>
 #define sz(x) (int)(x).size()
 #define all(x) (x).begin(),(x).end()
-#define rall(x) (x).rbegin(),(x).rend()
 
 using namespace std;
 
@@ -21,30 +20,22 @@ const db DINF=numeric_limits<db>::infinity();
 const db EPS=1e-9;
 const db PI=acos(db(-1));
 
-namespace std {
-
-template<class Fun>
-class y_combinator_result {
-    Fun fun_;
-public:
-    template<class T>
-    explicit y_combinator_result(T &&fun): fun_(std::forward<T>(fun)) {}
-
-    template<class ...Args>
-    decltype(auto) operator()(Args &&...args) {
-        return fun_(std::ref(*this), std::forward<Args>(args)...);
-    }
-};
-
-template<class Fun>
-decltype(auto) y_combinator(Fun &&fun) {
-    return y_combinator_result<std::decay_t<Fun>>(std::forward<Fun>(fun));
-}
-
-} // namespace std
-
 void runcase(){
-    
+    int n;
+    cin >> n;
+    vl a(n);
+    for(auto &x:a)cin >> x;
+    ll sum=a[0]/2*2;
+    vl cnt(2);
+    cnt[a[0]&1]++;
+    cout << a[0] << " ";
+    for(int i=1;i<n;i++){
+        sum+=a[i]/2*2;
+        cnt[a[i]&1]++;
+        ll ans=sum+(cnt[1]+1)/3*2;
+        cout << ans << " ";
+    }
+    cout << "\n";
 }
 
 int main(){

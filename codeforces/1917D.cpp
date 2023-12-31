@@ -1,7 +1,6 @@
 #include<bits/stdc++.h>
 #define sz(x) (int)(x).size()
 #define all(x) (x).begin(),(x).end()
-#define rall(x) (x).rbegin(),(x).rend()
 
 using namespace std;
 
@@ -14,8 +13,8 @@ using pii = pair<int,int>;
 using pll = pair<ll,ll>;
 using pdd = pair<db,db>;
 const int INF=0x3fffffff;
-const int MOD=1000000007;
-// const int MOD=998244353;
+// const int MOD=1000000007;
+const int MOD=998244353;
 const ll LINF=0x1fffffffffffffff;
 const db DINF=numeric_limits<db>::infinity();
 const db EPS=1e-9;
@@ -57,50 +56,78 @@ mint invmod(int x){
     return invs[x];
 }
 
-struct Combinatorics{
+template<class T>
+struct fenwick{
     int n;
-    vm fac,invfac;
-    Combinatorics(){
-        n=0;
-        fac=invfac={1};
-    }
+    vector<T> t;
+    fenwick(int n=0){init(n);}
     void init(int _n){
-        if(n>=_n)return;
-        fac.resize(_n+1);
-        invfac.resize(_n+1);
-        for(int i=n+1;i<=_n;i++)fac[i]=fac[i-1]*i;
-        invfac[_n]=fac[_n].inv();
-        for(int i=_n;i>n+1;i--)invfac[i-1]=invfac[i]*i;
         n=_n;
+        t.assign(n+1,T{});
     }
-    mint C(int n,int r){
-        if(n<0||r<0||n<r)return 0;
-        return fac[n]*invfac[n-r]*invfac[r];
+    void update(int x,const T &v){
+        for(int i=x+1;i<=n;i+=i&-i)t[i]=t[i]+v;
     }
-}combi;
+    void update(int l,int r,const T &v){
+        update(l,v),update(r+1,-v);
+    }
+    T query(int x){
+        T res{};
+        for(int i=x+1;i>0;i-=i&-i)res=res+t[i];
+        return res;
+    }
+    T query(int l,int r){
+        return query(r)-query(l-1);
+    }
+    int find(const T &k){
+        int x=0;
+        T cur{};
+        for(int i=1<<31-__builtin_clz(n);i>0;i>>=1)
+            if(x+i<=n&&cur+t[x+i]<k)x+=i,cur=cur+t[x];
+        return x;
+    }
+};
+
+void runcase(){
+    int n,m;
+    cin >> n >> m;
+    vl a(n),b(m);
+    for(auto &x:a)cin >> x;
+    for(auto &x:b)cin >> x;
+    mint ans=0;
+    fenwick<mint> f(m);
+    for(int i=0;i<m;i++){
+        ans+=f.query(b[i]+1,m-1);
+        f.update(b[i],1);
+    }
+    ans*=n;
+    vector<fenwick<mint>> vf(20);
+    for(auto &x:vf)x.init(2*n+1);
+    for(int i=0;i<n;i++){
+        for(int d=0;d<20;d++){
+            ll tmp=a[i]<<d;
+            if(tmp>=2*n)break;
+            int cnt=max(0,m-d);
+            ans+=cnt*vf[0].query(tmp+1,2*n);
+        }
+        mint tot=1ll*m*(m-1)/2;
+        for(int d=1;d<20;d++){
+            int cnt=max(0,m-d);
+            tot-=cnt;
+            ans+=cnt*vf[d].query(a[i]+1,2*n);
+        }
+        ans+=tot*i;
+        for(int d=0;d<20;d++){
+            ll tmp=min(a[i]<<d,2ll*n);
+            vf[d].update(tmp,1);
+        }
+    }
+    cout << ans << "\n";
+}
 
 int main(){
     cin.tie(nullptr)->sync_with_stdio(false);
-    int n,k;
-    cin >> n >> k;
-    vector<vi> adj(n);
-    for(int i=1;i<n;i++){
-        int u,v;
-        cin >> u >> v;
-        u--,v--;
-        adj[u].emplace_back(v);
-        adj[v].emplace_back(u);
-    }
-    if(k&1)cout << 1,exit(0);
-    combi.init(n);
-    mint tot=combi.C(n,k);
-    mint ans=tot;
-    function<int(int,int)> dfs=[&](int u,int p){
-        int sz=1;
-        for(auto v:adj[u])if(v!=p)sz+=dfs(v,u);
-        ans+=combi.C(sz,k/2)*combi.C(n-sz,k/2);
-        return sz;
-    };
-    dfs(0,-1);
-    cout << ans/tot << "\n";
+    int t(1);
+    cin >> t;
+    while(t--)runcase();
 }

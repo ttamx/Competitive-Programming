@@ -57,50 +57,106 @@ mint invmod(int x){
     return invs[x];
 }
 
-struct Combinatorics{
-    int n;
-    vm fac,invfac;
-    Combinatorics(){
-        n=0;
-        fac=invfac={1};
+mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
+
+const int N=2e5+5;
+const int K=1<<19;
+const mint BASE=rng();
+
+int n,q;
+vi a[3];
+string s;
+mint pw[N],pre[N];
+
+int get(char c){
+    if(c=='J')return 0;
+    if(c=='O')return 1;
+    if(c=='I')return 2;
+    return -1;
+}
+
+struct segtree{
+    mint t[K];
+    int lz[K];
+    void push(int l,int r,int i){
+        if(lz[i]==-1)return;
+        t[i]=lz[i]*(pre[r]-pre[l-1]);
+        if(l<r)lz[i*2]=lz[i*2+1]=lz[i];
+        lz[i]=-1;
     }
-    void init(int _n){
-        if(n>=_n)return;
-        fac.resize(_n+1);
-        invfac.resize(_n+1);
-        for(int i=n+1;i<=_n;i++)fac[i]=fac[i-1]*i;
-        invfac[_n]=fac[_n].inv();
-        for(int i=_n;i>n+1;i--)invfac[i-1]=invfac[i]*i;
-        n=_n;
+    void build(int l,int r,int i){
+        lz[i]=-1;
+        if(l==r)return void(t[i]=get(s[l])*pw[l]);
+        int m=(l+r)/2;
+        build(l,m,i*2);
+        build(m+1,r,i*2+1);
+        t[i]=t[i*2]+t[i*2+1];
     }
-    mint C(int n,int r){
-        if(n<0||r<0||n<r)return 0;
-        return fac[n]*invfac[n-r]*invfac[r];
+    void build(){
+        build(0,n-1,1);
     }
-}combi;
+    void update(int l,int r,int i,int x,int y,int v){
+        push(l,r,i);
+        if(y<l||r<x)return;
+        if(x<=l&&r<=y)return lz[i]=v,push(l,r,i);
+        int m=(l+r)/2;
+        update(l,m,i*2,x,y,v);
+        update(m+1,r,i*2+1,x,y,v);
+        t[i]=t[i*2]+t[i*2+1];
+    }
+    void update(int x,int y,int v){
+        update(0,n-1,1,x,y,v);
+    }
+}st;
+
+vi convert(const string &s){
+    vi res;
+    for(auto x:s)res.emplace_back(get(x));
+    return res;
+}
+
+mint hsh(const vi &a){
+    mint res=0;
+    for(int i=0;i<n;i++)res+=a[i]*pw[i];
+    return res;
+}
+
+vi cross(const vi &a,const vi &b){
+    vi res(n);
+    for(int i=0;i<n;i++)res[i]=(a[i]+b[i])*2%3;
+    return res;
+}
+
+vm val;
 
 int main(){
     cin.tie(nullptr)->sync_with_stdio(false);
-    int n,k;
-    cin >> n >> k;
-    vector<vi> adj(n);
-    for(int i=1;i<n;i++){
-        int u,v;
-        cin >> u >> v;
-        u--,v--;
-        adj[u].emplace_back(v);
-        adj[v].emplace_back(u);
+    cin >> n;
+    pw[0]=pre[0]=1;
+    for(int i=1;i<=n;i++)pw[i]=pw[i-1]*BASE,pre[i]=pre[i-1]+pw[i];
+    for(int i=0;i<3;i++){
+        string x;
+        cin >> x;
+        a[i]=convert(x);
     }
-    if(k&1)cout << 1,exit(0);
-    combi.init(n);
-    mint tot=combi.C(n,k);
-    mint ans=tot;
-    function<int(int,int)> dfs=[&](int u,int p){
-        int sz=1;
-        for(auto v:adj[u])if(v!=p)sz+=dfs(v,u);
-        ans+=combi.C(sz,k/2)*combi.C(n-sz,k/2);
-        return sz;
-    };
-    dfs(0,-1);
-    cout << ans/tot << "\n";
+    for(int i=0;i<3;i++){
+        val.emplace_back(hsh(a[i]));
+        val.emplace_back(hsh(cross(a[i],a[(i+1)%3])));
+        val.emplace_back(hsh(cross(cross(a[i],a[(i+1)%3]),a[(i+2)%3])));
+    }
+    cin >> q >> s;
+    st.build();
+    bool ok=false;
+    for(auto x:val)ok|=st.t[1]==x;
+    cout << (ok?"Yes\n":"No\n");
+    while(q--){
+        int l,r;
+        char c;
+        cin >> l >> r >> c;
+        l--,r--;
+        st.update(l,r,get(c));
+        ok=false;
+        for(auto x:val)ok|=st.t[1]==x;
+        cout << (ok?"Yes\n":"No\n");
+    }
 }

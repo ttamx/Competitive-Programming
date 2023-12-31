@@ -1,7 +1,6 @@
 #include<bits/stdc++.h>
 #define sz(x) (int)(x).size()
 #define all(x) (x).begin(),(x).end()
-#define rall(x) (x).rbegin(),(x).rend()
 
 using namespace std;
 
@@ -21,30 +20,24 @@ const db DINF=numeric_limits<db>::infinity();
 const db EPS=1e-9;
 const db PI=acos(db(-1));
 
-namespace std {
-
-template<class Fun>
-class y_combinator_result {
-    Fun fun_;
-public:
-    template<class T>
-    explicit y_combinator_result(T &&fun): fun_(std::forward<T>(fun)) {}
-
-    template<class ...Args>
-    decltype(auto) operator()(Args &&...args) {
-        return fun_(std::ref(*this), std::forward<Args>(args)...);
-    }
-};
-
-template<class Fun>
-decltype(auto) y_combinator(Fun &&fun) {
-    return y_combinator_result<std::decay_t<Fun>>(std::forward<Fun>(fun));
-}
-
-} // namespace std
-
 void runcase(){
-    
+    int n,d;
+    cin >> n >> d;
+    vi l(n);
+    for(auto &x:l)cin >> x;
+    sort(l.rbegin(),l.rend());
+    if(l[0]+l[1]>d)return void(cout << "No\n");
+    vector<bitset<2005>> dp(d+1);
+    dp[0][0]=1;
+    for(auto x:l){
+        for(int i=d;i>=0;i--){
+            dp[i]|=dp[i]<<x;
+            if(i>=x)dp[i]|=dp[i-x];
+        }
+    }
+    if(dp[l[0]][d-l[0]])return void(cout << "Yes\n");
+    for(int i=l[0];i<=d-l[0];i++)if(dp[i][d-i])return void(cout << "Yes\n");
+    cout << "No\n";
 }
 
 int main(){

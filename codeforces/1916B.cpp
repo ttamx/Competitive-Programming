@@ -1,7 +1,6 @@
 #include<bits/stdc++.h>
 #define sz(x) (int)(x).size()
 #define all(x) (x).begin(),(x).end()
-#define rall(x) (x).rbegin(),(x).rend()
 
 using namespace std;
 
@@ -21,34 +20,26 @@ const db DINF=numeric_limits<db>::infinity();
 const db EPS=1e-9;
 const db PI=acos(db(-1));
 
-namespace std {
+const int N=32005;
 
-template<class Fun>
-class y_combinator_result {
-    Fun fun_;
-public:
-    template<class T>
-    explicit y_combinator_result(T &&fun): fun_(std::forward<T>(fun)) {}
-
-    template<class ...Args>
-    decltype(auto) operator()(Args &&...args) {
-        return fun_(std::ref(*this), std::forward<Args>(args)...);
-    }
-};
-
-template<class Fun>
-decltype(auto) y_combinator(Fun &&fun) {
-    return y_combinator_result<std::decay_t<Fun>>(std::forward<Fun>(fun));
-}
-
-} // namespace std
+bool b[N];
+vl p;
 
 void runcase(){
-    
+    ll a,b;
+    cin >> a >> b;
+    ll g=gcd(a,b);
+    a/=g,b/=g;
+    if(a==1)cout << b*b*g << "\n";
+    else cout << a*b*g << "\n";
 }
 
 int main(){
     cin.tie(nullptr)->sync_with_stdio(false);
+    for(int i=2;i<N;i++)if(!b[i]){
+        p.emplace_back(i);
+        for(int j=i+i;j<N;j+=i)b[i]=true;
+    }
     int t(1);
     cin >> t;
     while(t--)runcase();
