@@ -22,7 +22,14 @@ const db EPS=1e-9;
 const db PI=acos(db(-1));
 
 void runcase(){
-    
+    int n;
+    string a,b,c;
+    cin >> n >> a >> b >> c;
+    for(int i=0;i<n;i++){
+        if(a[i]==b[i]&&a[i]!=c[i])return void(cout << "YES\n");
+        if(a[i]!=c[i]&&b[i]!=c[i])return void(cout << "YES\n");
+    }
+    cout << "NO\n";
 }
 
 int main(){

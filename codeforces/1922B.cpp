@@ -22,7 +22,21 @@ const db EPS=1e-9;
 const db PI=acos(db(-1));
 
 void runcase(){
-    
+    int n;
+    cin >> n;
+    vl cnt(n+1);
+    for(int i=0;i<n;i++){
+        int x;
+        cin >> x;
+        cnt[x]++;
+    }
+    ll ans=0,sum=0;
+    for(int i=0;i<=n;i++){
+        ans+=cnt[i]*(cnt[i]-1)*(cnt[i]-2)/6;
+        ans+=cnt[i]*(cnt[i]-1)*sum/2;
+        sum+=cnt[i];
+    }
+    cout << ans << "\n";
 }
 
 int main(){

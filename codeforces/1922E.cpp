@@ -22,7 +22,23 @@ const db EPS=1e-9;
 const db PI=acos(db(-1));
 
 void runcase(){
-    
+    ll x;
+    cin >> x;
+    int k=0;
+    while((2ll<<k)<=x)k++;
+    vi a(k);
+    iota(all(a),0);
+    x-=1ll<<k;
+    for(int i=k;i>=0;i--){
+        ll v=1ll<<i;
+        if(x>=v){
+            x-=v;
+            a.emplace_back(i);
+        }
+    }
+    cout << a.size() << "\n";
+    for(auto x:a)cout << x << " ";
+    cout << "\n";
 }
 
 int main(){

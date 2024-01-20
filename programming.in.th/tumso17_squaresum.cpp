@@ -56,7 +56,7 @@ struct segtree{
         if(y<l||r<x)return 0ll;
         if(x<=l&&r<=y)return t2[i];
         int m=(l+r)/2;
-        return query(l,m,i*2,x,y)+query(m+1,r,i*2+1,x,y)%mod;
+        return (query(l,m,i*2,x,y)+query(m+1,r,i*2+1,x,y))%mod;
     }
     ll query(int x,int y){
         return query(1,n,1,x,y);
