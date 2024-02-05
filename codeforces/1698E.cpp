@@ -84,15 +84,15 @@ struct MontgomeryModInt{
         return *this*=rhs.inv();
     }
 
-    constexpr mint &operator++(){return *this+=mint(1);}
-    constexpr mint &operator--(){return *this-=mint(1);}
+    constexpr mint &operator++(){return this+=mint(1);}
+    constexpr mint &operator--(){return this-=mint(1);}
     constexpr mint operator++(int){
         mint res=*this;
-        return *this+=mint(1),res;
+        return this+=mint(1),res;
     }
     constexpr mint operator--(int){
         mint res=*this;
-        return *this-=mint(1),res;
+        return this-=mint(1),res;
     }
 
     constexpr mint operator-()const{return mint()-mint(*this);};
@@ -126,37 +126,35 @@ using mint = MontgomeryModInt<MOD>;
 using vm = vector<mint>;
 
 void runcase(){
-    int n,k;
-    cin >> k;
-    n=1<<k;
-    vi a(n);
-    for(auto &x:a)cin >> x,x--;
-    int m=n;
-    mint ans=1;
-    for(int i=0;i<k;i++){
-        m>>=1;
-        mint num=1;
-        for(int j=0;j<n;j+=2<<i){
-            int cnt=0,cnt2=0,id=-1;
-            for(int x=0;x<(2<<i);x++){
-                if(a[j+x]==-2)cnt++,id=j+x;
-                else if(a[j+x]>=m){
-                    cnt2++,a[j+x]=-1;
-                }
-            }
-            if(cnt2>1)cout << 0,exit(0);
-            if(!cnt2){
-                if(!cnt)cout << 0,exit(0);
-                ans*=cnt*num++;
-                a[id]=-1;
-            }
+    int n,s;
+    cin >> n >> s;
+    vi a(n),b(n);
+    for(auto &x:a)cin >> x;
+    for(auto &x:b)cin >> x;
+    vector<bool> ok(n+2);
+    vi c,d;
+    for(int i=0;i<n;i++){
+        if(b[i]!=-1){
+            ok[b[i]]=true;
+            if(a[i]-b[i]>s)return void(cout << "0\n");
+        }else{
+            c.emplace_back(a[i]);
         }
     }
-    cout << ans;
+    for(int i=1;i<=n;i++)if(!ok[i])d.emplace_back(i);
+    sort(rall(c));
+    sort(rall(d));
+    mint ans=1;
+    for(int i=0,j=0;i<sz(c);i++){
+        while(j<sz(d)&&c[i]-d[j]<=s)j++;
+        ans*=j-i;
+    }
+    cout << ans << "\n";
 }
 
 int main(){
     cin.tie(nullptr)->sync_with_stdio(false);
     int t(1);
+    cin >> t;
     while(t--)runcase();
 }
