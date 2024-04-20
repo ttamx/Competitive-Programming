@@ -1,10 +1,11 @@
-#include<bits/stdc++.h>
+#include<iostream>
+#include<string>
 #pragma GCC optimize("Ofast")
 
 using namespace std;
 
-const int N=1e6+3;
-const int K=1e5+5;
+const int N=1000007;
+const int K=100005;
 
 int k,m,n;
 int mp[N],mem[N];

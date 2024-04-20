@@ -19,9 +19,8 @@ int main(){
     for(int sz=2;sz<=n;sz++){
         for(int l=1,r=sz;r<=n;l++,r++){
             for(int m=l;m<r;m++){
-                dp[l][r]=min(dp[l][r],dp[l][m]+dp[m+1][r]);
+                dp[l][r]=min(dp[l][r],qs[r]-qs[l-1]+dp[l][m]+dp[m+1][r]);
             }
-            dp[l][r]+=qs[r]-qs[l-1];
         }
     }
     cout << dp[1][n];

@@ -32,7 +32,7 @@ void solve(){
                 tarjan(v);
                 low[u]=min(low[u],low[v]);
             }else if(inpath[v]){
-                low[u]=min(low[u],low[v]);
+                low[u]=min(low[u],disc[v]);
             }
         }
         if(low[u]==disc[u]){

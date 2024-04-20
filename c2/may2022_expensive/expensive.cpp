@@ -12,7 +12,7 @@ vector<pair<int,int>> adj[N];
 pair<int,int> dp[N];
 int lv[N],pa[N][20];
 vector<int> lf;
-set<pair<int,int>> vec;
+vector<pair<int,int>> vec,good;
 
 void dfs(int u,int p){
 	lv[u]=lv[p]+1;
@@ -54,19 +54,21 @@ void initialize(int N, int Q, vector<pair<int, int>> R,vector<int> C) {
 	for(int i=0;i<lf.size();i++){
 		for(int j=0;j<i;j++){
 			auto [a,b]=calc(lf[i],lf[j]);
-			vec.emplace(a,b);
+			vec.emplace_back(a,-b);
 		}
 	}
-	int mx=-1;
-	for(auto it=vec.end();it!=vec.begin();){
-		it=prev(it);
-		if(it->second<=mx)it=vec.erase(it);
-		else mx=it->second;
+	sort(vec.begin(),vec.end());
+	int pre=-1;
+	for(auto [a,b]:vec){
+		if(a==pre)continue;
+		pre=a,b=-b;
+		while(!good.empty()&&good.back().second<=b)good.pop_back();
+		good.emplace_back(a,b);
 	}
 }
 
 long long most_expensive(int x, int y) {
 	ll res=0;
-	for(auto [a,b]:vec)res=max(res,1ll*a*x+1ll*b*y);
+	for(auto [a,b]:good)res=max(res,1ll*a*x+1ll*b*y);
 	return res;
 }

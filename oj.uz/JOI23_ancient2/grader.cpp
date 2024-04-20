@@ -1,7 +1,7 @@
 #include <cstdio>
 #include <cstdlib>
 
-#include "ancient2.cpp"
+#include "ancient2_100.cpp"
 
 namespace {
 
@@ -14,7 +14,7 @@ constexpr int N_MAX = 1'000;
 constexpr int M_MAX = 1'002;
 constexpr int Q_MAX = 1'000;
 
-int N;
+int NNN;
 char S[N_MAX + 1];
 
 int query_count = 0;
@@ -36,7 +36,7 @@ int Query(int m, std::vector<int> a, std::vector<int> b) {
   }
   if (m > query_m_max) query_m_max = m;
   int memory = 0;
-  for (int i = 0; i < N; i++) {
+  for (int i = 0; i < NNN; i++) {
     if (S[i] == '0') {
       memory = a[memory];
     }
@@ -48,7 +48,7 @@ int Query(int m, std::vector<int> a, std::vector<int> b) {
 }
 
 int main() {
-  if (scanf("%d", &N) != 1) {
+  if (scanf("%d", &NNN) != 1) {
     fprintf(stderr, "Error while reading input.\n");
     exit(1);
   }
@@ -56,12 +56,12 @@ int main() {
     fprintf(stderr, "Error while reading input.\n");
     exit(1);
   }
-  std::string s = Solve(N);
-  if ((int)s.size() != N) WrongAnswer(1);
-  for (int i = 0; i < N; i++) {
+  std::string s = Solve(NNN);
+  if ((int)s.size() != NNN) WrongAnswer(1);
+  for (int i = 0; i < NNN; i++) {
     if (!(s[i] == '0' || s[i] == '1')) WrongAnswer(2);
   }
-  for (int i = 0; i < N; i++) {
+  for (int i = 0; i < NNN; i++) {
     if (s[i] != S[i]) WrongAnswer(3);
   }
   printf("Accepted: %d\n", query_m_max);

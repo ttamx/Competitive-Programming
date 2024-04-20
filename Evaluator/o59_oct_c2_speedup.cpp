@@ -39,10 +39,10 @@ int main(){
             break;
         }
         for(auto [v,w]:adj[u]){
-            ll cos=d+(w>>s);
-            if(cos>=dp[v][s])continue;
-            pq.emplace(cos,v,s,p);
-            dp[v][s]=cos;
+            ll cost=d+(w>>s);
+            if(cost>=dp[v][s])continue;
+            pq.emplace(cost,v,s,p);
+            dp[v][s]=cost;
         }
         if(s<q && a[u]>0 && a[u]!=p){
             pq.emplace(d,u,s+1,a[u]);

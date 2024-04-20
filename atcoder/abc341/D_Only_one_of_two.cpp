@@ -1,0 +1,45 @@
+#include<bits/stdc++.h>
+#define sz(x) (int)(x).size()
+#define all(x) (x).begin(),(x).end()
+#define rall(x) (x).rbegin(),(x).rend()
+
+using namespace std;
+
+using ll = long long;
+using db = long double;
+using vi = vector<int>;
+using vl = vector<ll>;
+using vd = vector<db>;
+using pii = pair<int,int>;
+using pll = pair<ll,ll>;
+using pdd = pair<db,db>;
+const int INF=0x3fffffff;
+// const int MOD=1000000007;
+const int MOD=998244353;
+const ll LINF=0x1fffffffffffffff;
+const db DINF=numeric_limits<db>::infinity();
+const db EPS=1e-9;
+const db PI=acos(db(-1));
+
+void runcase(){
+    ll n,m,k;
+    cin >> n >> m >> k;
+    ll nm=lcm(n,m);
+    ll l=min(n,m),r=LINF;
+    auto calc=[&](ll x){
+        return x/n+x/m-x/nm*2;
+    };
+    while(l<r){
+        ll mid=(l+r)/2;
+        if(calc(mid)>=k)r=mid;
+        else l=mid+1;
+    }
+    cout << l << "\n";
+}
+
+int main(){
+    cin.tie(nullptr)->sync_with_stdio(false);
+    int t(1);
+    // cin >> t;
+    while(t--)runcase();
+}

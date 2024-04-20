@@ -1,6 +1,6 @@
 #include "forbiddenwords.cpp"
 #include <bits/stdc++.h>
-
+ 
 unsigned int SEED = 1373858591;
 
 mt19937 rng(SEED);
@@ -105,6 +105,7 @@ int main()
     
     if(output != X) {
       std::cout << "Incorrect\n";
+      std::cout << "Expected " << X << " found " << output;
       return 0;
     }
   }

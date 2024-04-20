@@ -393,6 +393,7 @@ std::pair<std::vector<node>, int> parse(std::string line) {
 }
 
 int main() {
+  // freopen("output.txt","w",stdout);
   grader::ps.push_back(p0);
   grader::ps.push_back(p1);
   std::string a, b;

@@ -2,49 +2,102 @@
 
 using namespace std;
 
+struct Tarjan{
+    int n;
+    vector<vector<int>> adj;
+    vector<int> disc,low,scc;
+    Tarjan(){}
+    Tarjan(int _n){
+        init(_n);
+    }
+    void init(int _n){
+        n=_n;
+        adj.assign(n,vector<int>{});
+        disc.assign(n,-1);
+        low.assign(n,-1);
+        scc.clear();
+    }
+    void add(int u,int v){
+        adj[u].emplace_back(v);
+    }
+    vector<int> work(){
+        if(!scc.empty())return scc;
+        scc.assign(n,-1);
+        vector<bool> inpath(n);
+        stack<int> path;
+        int timer=-1,cur=0;
+        function<void(int)> dfs=[&](int u){
+            disc[u]=low[u]=++timer;
+            path.emplace(u);
+            inpath[u]=true;
+            for(auto v:adj[u]){
+                if(disc[v]==-1){
+                    dfs(v);
+                    low[u]=min(low[u],low[v]);
+                }else if(inpath[v]){
+                    low[u]=min(low[u],disc[v]);
+                }
+            }
+            if(low[u]==disc[u]){
+                int v;
+                do{
+                    v=path.top();
+                    path.pop();
+                    inpath[v]=false;
+                    scc[v]=cur;
+                }while(v!=u);
+                scc[u]=cur++;
+            }
+        };
+        for(int i=0;i<n;i++)if(disc[i]==-1)dfs(i);
+        return scc;
+    }
+};
+
+struct TwoSAT{
+    int n;
+    Tarjan g;
+    int state;
+    TwoSAT(){}
+    TwoSAT(int _n){
+        init(_n);
+    }
+    void init(int _n){
+        n=_n;
+        g.init(2*n);
+        state=-1;
+    }
+    void add(int p,int q){
+        g.add(p<0?~p+n:p,q<0?~q+n:q);
+    }
+    bool work(){
+        if(state!=-1)return state;
+        state=1;
+        auto scc=g.work();
+        for(int i=0;i<n;i++)state&=scc[i]!=scc[i+n];
+        return state;
+    }
+};
+
 void solve(){
     int n,m;
     cin >> n >> m;
-    vector<pair<int,int>> a(n);
-    for(auto &[u,v]:a)cin >> u >> v;
-    vector<int> neg(m+1);
+    TwoSAT g(m);
+    for(int i=0;i<n;i++){
+        int u,v;
+        cin >> u >> v;
+        u--,v--;
+        g.add(~u,v);
+        g.add(~v,u);
+    }
     for(int i=0;i<m;i+=2){
         int u,v;
         cin >> u >> v;
-        neg[u]=v;
-        neg[v]=u;
+        u--,v--;
+        g.add(u,~v);
+        g.add(v,~u);
     }
-    vector<vector<int>> adj(m+1),rev(m+1);
-    for(auto [u,v]:a){
-        adj[neg[u]].emplace_back(v);
-        adj[neg[v]].emplace_back(u);
-        rev[v].emplace_back(neg[u]);
-        rev[u].emplace_back(neg[v]);
-    }
-    vector<bool> vis(m+1);
-    stack<int> s;
-    function<void(int)> dfs=[&](int u){
-        if(vis[u])return;
-        vis[u]=true;
-        for(auto v:adj[u])dfs(v);
-        s.emplace(u);
-    };
-    for(int i=1;i<=m;i++)dfs(i);
-    fill(vis.begin(),vis.end(),false);
-    vector<int> si(m+1),sz(m+1);
-    function<void(int,int)> scc=[&](int u,int i){
-        if(vis[u])return;
-        vis[u]=true;
-        si[u]=i;
-        for(auto v:rev[u])scc(v,i);
-    };
-    while(!s.empty()){
-        scc(s.top(),s.top());
-        s.pop();
-    }
-    char ans='Y';
-    for(int i=1;i<=m;i++)if(si[i]==si[neg[i]])ans='N';
-    cout << ans;
+    cout << "NY"[g.work()];
 }
 
 int main(){

@@ -11,3 +11,4 @@ teaching/
 *.o
 .DS_Store
 .vscode/
+tempCodeRunnerFile.cpp

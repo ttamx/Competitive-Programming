@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
-#include "wall.cpp"
+#include "wall2.cpp"
 
 int main()
 {

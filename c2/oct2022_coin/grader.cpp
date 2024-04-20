@@ -1,4 +1,4 @@
-#include "coin.cpp"
+#include "coin_sub1.cpp"
 #include <stdio.h>
 #include <vector>
 int main()

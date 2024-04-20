@@ -44,7 +44,7 @@ struct segtree{
     void update(int l,int r,int i,int &x,int &y,int &v){
         pushlz(l,r,i);
         if(y<l||r<x)return;
-        if(x<=l&&r<=y)return lz[i]=v,pushlz(l,r,i),void();
+        if(x<=l&&r<=y)return lz[i]=v,pushlz(l,r,i);
         int m=(l+r)/2;
         update(l,m,i*2,x,y,v);
         update(m+1,r,i*2+1,x,y,v);
@@ -88,20 +88,16 @@ struct minsegtree{
     void update(int x,int v){
         update(1,n,1,x,v);
     }
-    int findelement(int l,int r,int i,int v){
+    int find(int l,int r,int i,int x,int y,int v){
+        if(y<l||r<x||t[i]>v)return n+1;
         if(l==r)return l;
         int m=(l+r)/2;
-        return t[i*2]<=v?findelement(l,m,i*2,v):findelement(m+1,r,i*2+1,v);
+        int p=find(l,m,i*2,x,y,v);
+        if(p>n)p=find(m+1,r,i*2+1,x,y,v);
+        return p;
     }
-    t3 findsegment(int l,int r,int i,int x,int v){
-        if(r<x)return t3(inf,0,0);
-        if(x<=l)return t[i]<=v?t3(l,r,i):t3(inf,0,0);
-        int m=(l+r)/2;
-        return min(findsegment(l,m,i*2,x,v),findsegment(m+1,r,i*2+1,x,v));
-    }
-    int find(int x,int v){
-        auto [l,r,i]=findsegment(1,n,1,x,v);
-        return l==inf?n+1:findelement(l,r,i,v);
+    int find(int x,int y,int v){
+        return find(1,n,1,x,y,v);
     }
 }sl;
 
@@ -128,20 +124,16 @@ struct maxsegtree{
     void update(int x,int v){
         update(1,n,1,x,v);
     }
-    int findelement(int l,int r,int i,int v){
+    int find(int l,int r,int i,int x,int y,int v){
+        if(y<l||r<x||t[i]<v)return 0;
         if(l==r)return l;
         int m=(l+r)/2;
-        return t[i*2+1]>=v?findelement(m+1,r,i*2+1,v):findelement(l,m,i*2,v);
+        int p=find(m+1,r,i*2+1,x,y,v);
+        if(p<1)p=find(l,m,i*2,x,y,v);
+        return p;
     }
-    t3 findsegment(int l,int r,int i,int x,int v){
-        if(x<l)return t3(-inf,0,0);
-        if(r<=x)return t[i]>=v?t3(l,r,i):t3(-inf,0,0);
-        int m=(l+r)/2;
-        return max(findsegment(l,m,i*2,x,v),findsegment(m+1,r,i*2+1,x,v));
-    }
-    int find(int x,int v){
-        auto [l,r,i]=findsegment(1,n,1,x,v);
-        return l==-inf?0:findelement(l,r,i,v);
+    int find(int x,int y,int v){
+        return find(1,n,1,x,y,v);
     }
 }sr;
 
@@ -206,8 +198,8 @@ int simulate_query(int e) {
     e++;
     int cnt=f.read(e);
     if(cnt==0)return lonelytown_query();
-    int l=sr.find(e,e+1);
-    int r=sl.find(e+1,e);
+    int l=sr.find(1,e,e+1);
+    int r=sl.find(e+1,n,e);
     if(cnt==1){
         deledge(l,r);
         int res=lonelytown_query();
