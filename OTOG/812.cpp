@@ -1,30 +1,21 @@
-#include<bits/stdc++.h>
-#pragma GCC optimize("O3","unroll-loops")
-
-using namespace std;
-
-const int N=25;
-
-int n;
-long long a[N][N];
-map<int,long long> pre,cur;
+#include "template/Header.hpp"
+#include "Graph/MinCostFlow.hpp"
 
 int main(){
     cin.tie(nullptr)->sync_with_stdio(false);
+    int n;
     cin >> n;
-    for(int i=0;i<n;i++)for(int j=0;j<n;j++)cin >> a[i][j];
-    pre[0]=0;
+    MinCostFlow<ll,ll> mcf(n*2+2);
     for(int i=0;i<n;i++){
-        cur.clear();
         for(int j=0;j<n;j++){
-            for(auto [x,y]:pre){
-                if(x&(1<<j))continue;
-                auto it=cur.find(x|(1<<j));
-                if(it==cur.end())cur[x|(1<<j)]=y+a[i][j];
-                else it->second=min(it->second,y+a[i][j]);
-            }
+            int x;
+            cin >> x;
+            mcf.addEdge(i,j+n,1,x);
         }
-        pre=cur;
     }
-    cout << cur[(1<<n)-1];
+    for(int i=0;i<n;i++){
+        mcf.addEdge(n*2,i,1,0);
+        mcf.addEdge(i+n,n*2+1,1,0);
+    }
+    cout << mcf.flow(n*2,n*2+1).second;
 }
