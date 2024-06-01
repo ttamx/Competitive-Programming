@@ -21,22 +21,26 @@ const db DINF=numeric_limits<db>::infinity();
 const db EPS=1e-9;
 const db PI=acos(db(-1));
 
-void runcase(){
-    int n,m,k;
-    cin >> n >> m >> k;
-    int a=n/k,b=n-a*k;
-    vi v(n);
-    for(auto &x:v)cin >> x;
-    for(auto x:v){
-        if(x>a+1)return void(cout << "NO\n");
-        if(x==a+1&&--b<0)return void(cout << "NO\n");
-    }
-    cout << "YES\n";
-}
+const int X=1e6+5;
+
+int cnt[X],cum[X];
 
 int main(){
     cin.tie(nullptr)->sync_with_stdio(false);
-    int t(1);
-    cin >> t;
-    while(t--)runcase();
+    int n;
+    cin >> n;
+    for(int i=0;i<n;i++){
+        int x;
+        cin >> x;
+        cnt[x]++;
+    }
+    for(int i=1;i<X;i++)cum[i]=cum[i-1]+cnt[i];
+    ll ans=0;
+    for(int i=1;i<X;i++){
+        ll pre=ans;
+        ans+=1LL*cnt[i]*(cnt[i]-1)/2;
+        ans+=1LL*(cum[min(X-1,2*i-1)]-cum[i])*cnt[i];
+        for(int j=2;j*i<X;j++)ans+=1LL*(cum[min(X-1,(j+1)*i-1)]-cum[j*i-1])*cnt[i]*j;
+    }
+    cout << ans;
 }

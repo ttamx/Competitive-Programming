@@ -21,22 +21,29 @@ const db DINF=numeric_limits<db>::infinity();
 const db EPS=1e-9;
 const db PI=acos(db(-1));
 
+
+
 void runcase(){
-    int n,m,k;
-    cin >> n >> m >> k;
-    int a=n/k,b=n-a*k;
-    vi v(n);
-    for(auto &x:v)cin >> x;
-    for(auto x:v){
-        if(x>a+1)return void(cout << "NO\n");
-        if(x==a+1&&--b<0)return void(cout << "NO\n");
+    ll n,m;
+    cin >> n >> m;
+    ll ans=0;
+    for(int i=0;i<60;i++)if(m>>i&1){
+        ll x=n;
+        if(!(x>>i&1)){
+            x&=~((1LL<<i)-1);
+            x--;
+            if(x<0)continue;
+        }
+        ans+=x&((1LL<<i)-1);
+        ans+=(x>>(i+1))<<i;
+        ans++;
+        ans%=MOD;
     }
-    cout << "YES\n";
+    cout << ans;
 }
 
 int main(){
     cin.tie(nullptr)->sync_with_stdio(false);
     int t(1);
-    cin >> t;
     while(t--)runcase();
 }

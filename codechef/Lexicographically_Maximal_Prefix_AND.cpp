@@ -22,16 +22,24 @@ const db EPS=1e-9;
 const db PI=acos(db(-1));
 
 void runcase(){
-    int n,m,k;
-    cin >> n >> m >> k;
-    int a=n/k,b=n-a*k;
-    vi v(n);
-    for(auto &x:v)cin >> x;
-    for(auto x:v){
-        if(x>a+1)return void(cout << "NO\n");
-        if(x==a+1&&--b<0)return void(cout << "NO\n");
+    int n;
+    cin >> n;
+    vi a(n);
+    for(auto &x:a)cin >> x;
+    sort(a.begin(),a.end());
+    vi b(n);
+    for(int i=0;i<n;i++){
+        b[i]=a.back();
+        a.pop_back();
+        if(i){
+            b[i]&=b[i-1];
+            if(b[i]==b[i-1])continue;
+        }
+        for(auto &x:a)x&=b[i];
+        sort(a.begin(),a.end());
     }
-    cout << "YES\n";
+    for(auto x:b)cout << x << " ";
+    cout << "\n";
 }
 
 int main(){

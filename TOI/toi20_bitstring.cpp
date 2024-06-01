@@ -13,12 +13,10 @@ int main(){
     int m=1<<n;
     vector<long long> dp(m);
     auto get=[&](){
-        char c;
+        string s;
+        cin >> s;
         int mask=0;
-        for(int i=0;i<n;i++){
-            cin >> c;
-            mask=mask<<1|(c=='1');
-        }
+        for(auto x:s)mask=mask<<1|(x=='1');
         return mask;
     };
     for(int i=0;i<m;i++)cin >> dp[get()];

@@ -29,12 +29,14 @@ int main(){
     for(int i=n;i>=1;i--){
         for(int j=mx+1;j>=1;j--)if(dp[j-1]>=w[i]){
             dp[j]=max(dp[j],min(dp[j-1]-w[i],l[i]));
-            dpr[i]=max(dpr[i],j);
+            mx=max(mx,j);
         }
-        mx=max(mx,dpr[i]);
+        dpr[i]=mx;
     }
     int ans=1;
-    for(int i=1;i<=n;i++)ans=max(ans,dpl[i]+dpr[i+1]);
+    for(int i=1;i<=n;i++){
+        ans=max(ans,dpl[i]+dpr[i+1]);
+    }
     cout << ans << "\n";
     for(int i=1;i<=n;i++)if(dpl[i]+dpr[i+1]==ans)cout << i << " ";
 }

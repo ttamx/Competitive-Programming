@@ -22,16 +22,19 @@ const db EPS=1e-9;
 const db PI=acos(db(-1));
 
 void runcase(){
-    int n,m,k;
-    cin >> n >> m >> k;
-    int a=n/k,b=n-a*k;
-    vi v(n);
-    for(auto &x:v)cin >> x;
-    for(auto x:v){
-        if(x>a+1)return void(cout << "NO\n");
-        if(x==a+1&&--b<0)return void(cout << "NO\n");
+    ll a,b,k;
+    cin >> a >> b >> k;
+    vl pw{1};
+    while(a*pw.back()<=b)pw.emplace_back(pw.back()*k);
+    pw.pop_back();
+    int ans=sz(pw)-1;
+    b-=pw.back()*a;
+    while(b>0){
+        ans+=b/pw.back();
+        b%=pw.back();
+        pw.pop_back();
     }
-    cout << "YES\n";
+    cout << ans << "\n";
 }
 
 int main(){

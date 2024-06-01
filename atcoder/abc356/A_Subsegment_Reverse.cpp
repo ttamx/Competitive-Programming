@@ -22,21 +22,16 @@ const db EPS=1e-9;
 const db PI=acos(db(-1));
 
 void runcase(){
-    int n,m,k;
-    cin >> n >> m >> k;
-    int a=n/k,b=n-a*k;
-    vi v(n);
-    for(auto &x:v)cin >> x;
-    for(auto x:v){
-        if(x>a+1)return void(cout << "NO\n");
-        if(x==a+1&&--b<0)return void(cout << "NO\n");
-    }
-    cout << "YES\n";
+    int n,l,r;
+    cin >> n >> l >> r;
+    vi a(n);
+    iota(all(a),1);
+    reverse(a.begin()+l-1,a.begin()+r);
+    for(auto x:a)cout << x << ' ';
 }
 
 int main(){
     cin.tie(nullptr)->sync_with_stdio(false);
     int t(1);
-    cin >> t;
     while(t--)runcase();
 }

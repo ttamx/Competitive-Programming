@@ -24,19 +24,36 @@ const db PI=acos(db(-1));
 void runcase(){
     int n,m,k;
     cin >> n >> m >> k;
-    int a=n/k,b=n-a*k;
-    vi v(n);
-    for(auto &x:v)cin >> x;
-    for(auto x:v){
-        if(x>a+1)return void(cout << "NO\n");
-        if(x==a+1&&--b<0)return void(cout << "NO\n");
+    vector<pair<int,int>> a(m);
+    for(auto &[mask,res]:a){
+        int t;
+        cin >> t;
+        while(t--){
+            int x;
+            cin >> x;
+            x--;
+            mask|=1<<x;
+        }
+        char c;
+        cin >> c;
+        res=c=='o';
     }
-    cout << "YES\n";
+    int ans=0;
+    for(int mask=0;mask<1<<n;mask++){
+        bool ok=true;
+        for(auto [mask2,res]:a){
+            if((__builtin_popcount(mask&mask2)>=k)!=res){
+                ok=false;
+                break;
+            }
+        }
+        if(ok)ans++;
+    }
+    cout << ans << "\n";
 }
 
 int main(){
     cin.tie(nullptr)->sync_with_stdio(false);
     int t(1);
-    cin >> t;
     while(t--)runcase();
 }
