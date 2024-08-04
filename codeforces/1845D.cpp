@@ -1,22 +1,41 @@
 #include<bits/stdc++.h>
+#define sz(x) (int)(x).size()
+#define all(x) (x).begin(),(x).end()
+#define rall(x) (x).rbegin(),(x).rend()
 
 using namespace std;
 
-typedef long long ll;
+using ll = long long;
+using db = long double;
+using vi = vector<int>;
+using vl = vector<ll>;
+using vd = vector<db>;
+using pii = pair<int,int>;
+using pll = pair<ll,ll>;
+using pdd = pair<db,db>;
+const int INF=0x3fffffff;
+// const int MOD=1000000007;
+const int MOD=998244353;
+const ll LINF=0x1fffffffffffffff;
+const db DINF=numeric_limits<db>::infinity();
+const db EPS=1e-9;
+const db PI=acos(db(-1));
 
 void runcase(){
     int n;
     cin >> n;
-    vector<ll> a(n+1),mn(n+2);
-    for(int i=1;i<=n;i++)cin >> a[i],a[i]+=a[i-1];
-    mn[n+1]=1e18;
-    for(int i=n;i>=1;i--)mn[i]=min(mn[i+1],a[i]);
-    ll mx=-1e18,ans=0;
-    for(int i=0;i<=n;i++){
-        ll res=max(0ll,a[i]-mn[i+1]);
-        if(res>mx)mx=res,ans=a[i];
+    vector<ll> a(n);
+    for(auto &x:a)cin >> x;
+    for(int i=0;i<n-1;i++)a[i+1]+=a[i];
+    ll mx=0;
+    pair<ll,ll> ans(0,0);
+    reverse(a.begin(),a.end());
+    a.emplace_back(0);
+    for(auto x:a){
+        ans=max(ans,{x+mx,x});
+        mx=max(mx,a[0]-x);
     }
-    cout << ans << "\n";
+    cout << ans.second << "\n";
 }
 
 int main(){

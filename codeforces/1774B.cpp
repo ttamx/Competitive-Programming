@@ -25,7 +25,7 @@ void runcase(){
     int n,m,k;
     cin >> n >> m >> k;
     int a=n/k,b=n-a*k;
-    vi v(n);
+    vi v(m);
     for(auto &x:v)cin >> x;
     for(auto x:v){
         if(x>a+1)return void(cout << "NO\n");

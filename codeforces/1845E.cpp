@@ -1,11 +1,35 @@
-#include<bits/stdc++.h>
+#include "template.hpp"
+#include "modular-arithmetic/montgomery-modint.hpp"
 
-using namespace std;
+using mint = mint107;
 
 void runcase(){
-    int ans=0;
-    for(int i=2;i<1000;i++)if(i%3==0||i%5==0||i%7==0)ans++;
-    cout << ans;
+    int n,k;
+    cin >> n >> k;
+    vector<int> a(n);
+    for(auto &x:a)cin >> x;
+    const int m=60;
+    vector dp(2*m+1,vector<mint>(k+1));
+    dp[m][0]=1;
+    for(auto x:a){
+        vector ndp(2*m+1,vector<mint>(k+1));
+        for(auto y:{0,1}){
+            int d=x-y;
+            for(int i=-m;i<=m;i++){
+                int ni=i+d;
+                if(ni<-m||m<ni)continue;
+                for(int j=0;j<=k;j++){
+                    int nj=j+abs(ni);
+                    if(nj>k)continue;
+                    ndp[ni+m][nj]+=dp[i+m][j];
+                }
+            }
+        }
+        swap(dp,ndp);
+    }
+    mint ans=0;
+    for(int i=k;i>=0;i-=2)ans+=dp[m][i];
+    cout << ans << "\n";
 }
 
 int main(){

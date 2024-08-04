@@ -1,62 +1,67 @@
-#include<bits/stdc++.h>
+#include "template.hpp"
+#include "data-structure/fenwick-tree.hpp"
 
-using namespace std;
+mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
-const int K=1<<20;
-
-struct segtree{
-    int tree[K];
-    void build(int l,int r,int i){
-        if(l==r){
-            tree[i]=0;
-            return;
+void runcase(){
+    int n,q;
+    cin >> n >> q;
+    vector<int> a(n);
+    for(auto &x:a)cin >> x;
+    vector<tuple<int,int,int,int>> qr(q);
+    auto vals=a;
+    for(auto &[t,l,r,x]:qr){
+        cin >> t;
+        if(t==1){
+            cin >> l >> x;
+            l--;
+            vals.emplace_back(x);
+        }else{
+            cin >> l >> r >> x;
+            l--,r--;
         }
-        int m=(l+r)>>1;
-        build(l,m,i<<1);
-        build(m+1,r,i<<1|1);
-        tree[i]=gcd(tree[i<<1],tree[i<<1|1]);
     }
-    void update(int l,int r,int i,int x,int v){
-        if(x<l||x>r)return;
-        if(l==r){
-            tree[i]=v;
-            return;
+    sort(vals.begin(),vals.end());
+    vals.erase(unique(vals.begin(),vals.end()),vals.end());
+    int m=vals.size();
+    for(auto &x:a)x=lower_bound(vals.begin(),vals.end(),x)-vals.begin();
+    for(auto &[t,l,r,x]:qr)if(t==1)x=lower_bound(vals.begin(),vals.end(),x)-vals.begin();
+    vector mask(30,vector<int>(m));
+    for(auto &v:mask)for(auto &x:v)x=rng()&1;
+    vector<Fenwick<int>> f(30,n);
+    auto update=[&](int i,int v){
+        for(int j=0;j<30;j++){
+            if(mask[j][a[i]]){
+                f[j].update(i,v);
+            }
         }
-        int m=(l+r)>>1;
-        update(l,m,i<<1,x,v);
-        update(m+1,r,i<<1|1,x,v);
-        tree[i]=gcd(tree[i<<1],tree[i<<1|1]);
+    };
+    for(int i=0;i<n;i++)update(i,1);
+    for(auto &[t,l,r,x]:qr){
+        cin >> t;
+        if(t==1){
+            update(l,-1);
+            a[l]=x;
+            update(l,1);
+        }else{
+            if(x==1){
+                cout << "YES\n";
+            }else{
+                bool ok=true;
+                for(int i=0;i<30;i++){
+                    if(f[i].query(l,r)%x!=0){
+                        ok=false;
+                        break;
+                    }
+                }
+                cout << (ok?"YES":"NO") << "\n";
+            }
+        }
     }
-    int query(int l,int r,int i,int x,int y){
-        if(y<l||r<x)return 0;
-        if(x<=l&&r<=y)return tree[i];
-        int m=(l+r)>>1;
-        return gcd(query(l,m,i<<1,x,y),query(m+1,r,i<<1|1,x,y));
-    }
-}s;
+}
 
 int main(){
     cin.tie(nullptr)->sync_with_stdio(false);
-    int n,q;
-    cin >> n >> q;
-    for(int i=1;i<=n;++i){
-        int x;
-        cin >> x;
-        s.update(1,n,1,i,x);
-    }
-    while(q--){
-        int o;
-        cin >> o;
-        if(o==1){
-            int x,y;
-            cin >> x >> y;
-            s.update(1,n,1,x,y);
-        }else{
-            int l,r,k;
-            cin >> l >> r >> k;
-            cout << s.query(1,n,1,l,r) << '\n';
-            if(s.query(1,n,1,l,r)%k==0)cout << "YES\n";
-            else cout << "NO\n";
-        }
-    }
+    int t(1);
+    while(t--)runcase();
 }

@@ -1,45 +1,35 @@
-#include<bits/stdc++.h>
+#include "template.hpp"
+#include "modular-arithmetic/modint.hpp"
 
-using namespace std;
+using mint = ModInt<0>;
 
-const int N=5005;
-
-typedef long long ll;
-
-ll n,p;
-ll fac[N],inv[N],dp[N];
-
-ll binpow(ll a,ll b){
-    ll ret=1;
-    while(b){
-        if(b&1)ret=(ret*a)%p;
-        a=(a*a)%p;
-        b>>=1;
+void runcase(){
+    int n,mod;
+    cin >> n >> mod;
+    mint::set_mod(mod);
+    vector<mint> fac(n+1);
+    fac[0]=1;
+    for(int i=1;i<=n;i++)fac[i]=fac[i-1]*i;
+    vector C(n+1,vector<mint>(n+1));
+    for(int i=0;i<=n;i++){
+        C[i][0]=C[i][i]=1;
+        for(int j=1;j<i;j++){
+            C[i][j]=C[i-1][j-1]+C[i-1][j];
+        }
     }
-    return ret;
-}
-
-ll C(int n,int r){
-    return (((fac[n]*inv[n-r])%p)*inv[r])%p;
+    mint ans=0;
+    int m=n/2;
+    for(int i=m;i<=n-2;i++){
+        for(int j=0;j<=n-i-2;j++){
+            ans+=C[n-i-2][j]*fac[i+j-1]*(2*m-i);
+        }
+    }
+    if(n%2==0)ans+=fac[n-2];
+    cout << ans*n << "\n";
 }
 
 int main(){
     cin.tie(nullptr)->sync_with_stdio(false);
-    cin >> n >> p;
-    fac[0]=1;
-    inv[0]=1;
-    for(int i=1;i<=n;i++){
-        fac[i]=(fac[i-1]*i)%p;
-        inv[i]=binpow(fac[i],p-2);
-    }
-    ll ans=0,sum=0;
-    for(int i=n/2;i>0;i--){
-        if(i==1)dp[i]=1;
-        else for(int j=i;j<=n/2;j++)dp[i]=(dp[i]+C(j-i,i-2))%p;
-        dp[i]=(dp[i]*fac[n-i])%p;
-        ans=(ans+((dp[i]-sum+p)%p))%p;
-        cout << (dp[i]-sum+p)%p << '\n';
-        sum+=dp[i];
-    }
-    cout << ans;
+    int t(1);
+    while(t--)runcase();
 }

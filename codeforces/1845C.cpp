@@ -1,33 +1,45 @@
 #include<bits/stdc++.h>
+#define sz(x) (int)(x).size()
+#define all(x) (x).begin(),(x).end()
+#define rall(x) (x).rbegin(),(x).rend()
 
 using namespace std;
 
-typedef long long ll;
+using ll = long long;
+using db = long double;
+using vi = vector<int>;
+using vl = vector<ll>;
+using vd = vector<db>;
+using pii = pair<int,int>;
+using pll = pair<ll,ll>;
+using pdd = pair<db,db>;
+const int INF=0x3fffffff;
+// const int MOD=1000000007;
+const int MOD=998244353;
+const ll LINF=0x1fffffffffffffff;
+const db DINF=numeric_limits<db>::infinity();
+const db EPS=1e-9;
+const db PI=acos(db(-1));
 
 void runcase(){
     string s;
     cin >> s;
     int n=s.size();
-    s=" "+s;
     int m;
     cin >> m;
     string l,r;
     cin >> l >> r;
-    l=" "+l;
-    r=" "+r;
-    int idx=1;
-    for(int i=1;i<=m;i++){
-        int all=r[i]-l[i]+1;
-        vector<bool> b(10,true);
-        while(idx<=n&&all>0){
-            int x=s[idx];
-            if(b[x-'0']){
-                b[x-'0']=false;
-                if(l[i]<=x&&x<=r[i])all--;
-            }
-            idx++;
+    int cur=0;
+    vector<int> id(10);
+    for(int i=0;i<m;i++){
+        int mx=cur;
+        for(int j=l[i]-'0';j<=r[i]-'0';j++){
+            id[j]=max(id[j],cur);
+            while(id[j]<n&&s[id[j]]!=('0'+j))id[j]++;
+            mx=max(mx,id[j]);
         }
-        if(idx>n&&all>0)return void(cout << "YES\n");
+        if(mx==n)return void(cout << "YES\n");
+        cur=mx+1;
     }
     cout << "NO\n";
 }

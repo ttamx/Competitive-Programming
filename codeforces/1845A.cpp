@@ -1,33 +1,43 @@
 #include<bits/stdc++.h>
+#define sz(x) (int)(x).size()
+#define all(x) (x).begin(),(x).end()
+#define rall(x) (x).rbegin(),(x).rend()
 
 using namespace std;
+
+using ll = long long;
+using db = long double;
+using vi = vector<int>;
+using vl = vector<ll>;
+using vd = vector<db>;
+using pii = pair<int,int>;
+using pll = pair<ll,ll>;
+using pdd = pair<db,db>;
+const int INF=0x3fffffff;
+// const int MOD=1000000007;
+const int MOD=998244353;
+const ll LINF=0x1fffffffffffffff;
+const db DINF=numeric_limits<db>::infinity();
+const db EPS=1e-9;
+const db PI=acos(db(-1));
 
 void runcase(){
     int n,k,x;
     cin >> n >> k >> x;
-    if(x>1){
+    if(x==1){
+        if(k==1)return void(cout << "NO\n");
+        if(k==2&&n%2==1)return void(cout << "NO\n");
         cout << "YES\n";
-        cout << n << "\n";
-        for(int i=1;i<=n;i++)cout << 1 << " \n"[i==n];
-    }else if(k==1){
-        cout << "NO\n";
-    }else if(k==2){
-        if(n&1)cout << "NO\n";
-        else{
-            cout << "YES\n";
-            cout << n/2 << "\n";
-            for(int i=1;i<=n/2;i++)cout << 2 << " \n"[i==n/2];
-        }
+        cout << n/2 << "\n";
+        for(int i=0;i<n/2-1;i++)cout << 2 << " ";
+        if(n%2==1)cout << 3 << " ";
+        else cout << 2 << " ";
+        cout << "\n";
     }else{
         cout << "YES\n";
-        if(n&1){
-            cout << (n-3)/2+1 << "\n";
-            for(int i=1;i<=(n-3)/2;i++)cout << "2 ";
-            cout << "3\n";
-        }else{
-            cout << n/2 << "\n";
-            for(int i=1;i<=n/2;i++)cout << 2 << " \n"[i==n/2];
-        }
+        cout << n << "\n";
+        for(int i=0;i<n;i++)cout << 1 << " ";
+        cout << "\n";
     }
 }
 

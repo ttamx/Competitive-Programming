@@ -22,12 +22,20 @@ const db EPS=1e-9;
 const db PI=acos(db(-1));
 
 void runcase(){
-    
+    int n;
+    cin >> n;
+    string t="";
+    for(int i=0;i<n;i++){
+        string s;
+        cin >> s;
+        if(s=="sweet"&&s==t&&i<n-1)return void(cout << "No\n");
+        t=s;
+    }
+    cout << "Yes\n";
 }
 
 int main(){
     cin.tie(nullptr)->sync_with_stdio(false);
     int t(1);
-    cin >> t;
     while(t--)runcase();
 }
