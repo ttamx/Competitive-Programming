@@ -115,7 +115,8 @@
         "stacktrace": "cpp",
         "stdfloat": "cpp",
         "filesystem": "cpp",
-        "dorm": "cpp"
+        "dorm": "cpp",
+        "__verbose_abort": "cpp"
     },
     "cph.general.onceMaintainerMessage": false
 }

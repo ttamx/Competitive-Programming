@@ -22,20 +22,17 @@ const db EPS=1e-9;
 const db PI=acos(db(-1));
 
 void runcase(){
-    int n;
-    ll m;
-    cin >> n >> m;
-    vector<int> a(n);
-    for(auto &x:a)cin >> x;
-    sort(a.begin(),a.end());
-    ll sum=0,ans=0;
-    for(int l=0,r=0;l<n;l++){
-        while(r<n&&(sum+a[r]<=m&&a[r]-a[l]<=1)){
-            sum+=a[r];
-            r++;
-        }
-        ans=max(ans,sum);
-        sum-=a[l];
+    string s;
+    cin >> s;
+    int n=s.size();
+    ll ans=0;
+    for(int i=0,j=0;i<n;i++){
+        if(s[i]=='0')continue;
+        j=max(j,i);
+        while(j<n&&s[j]=='1')j++;
+        if(j>=n)break;
+        ans+=j-i+1;
+        swap(s[i],s[j]);
     }
     cout << ans << "\n";
 }

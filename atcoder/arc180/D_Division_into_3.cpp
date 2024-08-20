@@ -30,36 +30,40 @@ int main(){
         if(l<nr-1)ql[l].emplace_back(i,nr-1);
         if(nl+1<r)qr[r].emplace_back(i,nl+1);
     }
-    LazySegmentTree<MinAddAction<int>> seg2(n);
-    stack<Info> s;
-    for(int i=1;i<n;i++){
-        Info cur(a[i],i-1,i-1);
-        while(!s.empty()&&s.top().val<a[i]){
-            auto x=s.top();
-            s.pop();
-            seg2.update(x.l,x.r,a[i]-x.val);
-            cur.l=x.l;
-        }
-        s.emplace(cur);
-        seg2.modify(i-1,a[i-1]+a[i]);
-        for(auto [id,l]:qr[i]){
-            ans[id]=min(ans[id],seg2.query(l,i-1));
+    {
+        LazySegmentTree<MinAddAction<int>> seg2(n);
+        stack<Info> s;
+        for(int i=1;i<n;i++){
+            Info cur(a[i],i-1,i-1);
+            while(!s.empty()&&s.top().val<a[i]){
+                auto x=s.top();
+                s.pop();
+                seg2.update(x.l,x.r,a[i]-x.val);
+                cur.l=x.l;
+            }
+            s.emplace(cur);
+            seg2.modify(i-1,a[i-1]+a[i]);
+            for(auto [id,l]:qr[i]){
+                ans[id]=min(ans[id],seg2.query(l,i-1));
+            }
         }
     }
-    seg2.init(n);
-    while(!s.empty())s.pop();
-    for(int i=n-2;i>=0;i--){
-        Info cur(a[i],i+1,i+1);
-        while(!s.empty()&&s.top().val<a[i]){
-            auto x=s.top();
-            s.pop();
-            seg2.update(x.l,x.r,a[i]-x.val);
-            cur.r=x.r;
-        }
-        s.emplace(cur);
-        seg2.modify(i+1,a[i+1]+a[i]);
-        for(auto [id,r]:ql[i]){
-            ans[id]=min(ans[id],seg2.query(i+1,r));
+    {
+        LazySegmentTree<MinAddAction<int>> seg2(n);
+        stack<Info> s;
+        for(int i=n-2;i>=0;i--){
+            Info cur(a[i],i+1,i+1);
+            while(!s.empty()&&s.top().val<a[i]){
+                auto x=s.top();
+                s.pop();
+                seg2.update(x.l,x.r,a[i]-x.val);
+                cur.r=x.r;
+            }
+            s.emplace(cur);
+            seg2.modify(i+1,a[i+1]+a[i]);
+            for(auto [id,r]:ql[i]){
+                ans[id]=min(ans[id],seg2.query(i+1,r));
+            }
         }
     }
     for(int i=0;i<q;i++)cout << ans[i]+mx[i] << "\n";
