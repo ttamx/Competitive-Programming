@@ -1,7 +1,6 @@
 #include<bits/stdc++.h>
 #define sz(x) (int)(x).size()
 #define all(x) (x).begin(),(x).end()
-#define rall(x) (x).rbegin(),(x).rend()
 
 using namespace std;
 
@@ -21,28 +20,20 @@ const db DINF=numeric_limits<db>::infinity();
 const db EPS=1e-9;
 const db PI=acos(db(-1));
 
-void runcase(){
-    int n;
-    ll m;
-    cin >> n >> m;
-    vector<int> a(n);
-    for(auto &x:a)cin >> x;
-    sort(a.begin(),a.end());
-    ll sum=0,ans=0;
-    for(int l=0,r=0;l<n;l++){
-        while(r<n&&(sum+a[r]<=m&&a[r]-a[l]<=1)){
-            sum+=a[r];
-            r++;
-        }
-        ans=max(ans,sum);
-        sum-=a[l];
-    }
-    cout << ans << "\n";
-}
-
 int main(){
     cin.tie(nullptr)->sync_with_stdio(false);
-    int t(1);
-    cin >> t;
-    while(t--)runcase();
+    for(int a=1;a<=9;a++){
+        for(int b=1;b<=9;b++){
+            for(int c=1;c<=9;c++){
+                for(int d=1;d<=9;d++){
+                    set<int> s{a,b,c,d};
+                    if(s.size()<4)continue;
+                    if(a*b*c-d==153){
+                        cout << a << " " << b << " " << c << " " << d << "\n";
+                        return 0;
+                    }
+                }
+            }
+        }
+    }
 }

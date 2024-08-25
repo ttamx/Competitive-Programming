@@ -21,27 +21,45 @@ const db DINF=numeric_limits<db>::infinity();
 const db EPS=1e-9;
 const db PI=acos(db(-1));
 
+const int N=1e7+5;;
+
+int lp[N];
+vector<int> prime;
+int nimber[N];
+
 void runcase(){
     int n;
-    ll m;
-    cin >> n >> m;
-    vector<int> a(n);
-    for(auto &x:a)cin >> x;
-    sort(a.begin(),a.end());
-    ll sum=0,ans=0;
-    for(int l=0,r=0;l<n;l++){
-        while(r<n&&(sum+a[r]<=m&&a[r]-a[l]<=1)){
-            sum+=a[r];
-            r++;
-        }
-        ans=max(ans,sum);
-        sum-=a[l];
+    cin >> n;
+    int ans=0;
+    for(int i=0;i<n;i++){
+        int x;
+        cin >> x;
+        ans^=nimber[x];
     }
-    cout << ans << "\n";
+    cout << (ans?"Alice":"Bob") << "\n";
 }
 
 int main(){
     cin.tie(nullptr)->sync_with_stdio(false);
+    lp[1]=1;
+    for(int i=2;i<N;i++){
+        if(!lp[i]){
+            lp[i]=i;
+            prime.emplace_back(i);
+        }
+        for(int j=0;i*prime[j]<N;j++){
+            lp[i*prime[j]]=prime[j];
+            if(prime[j]==lp[i])break;
+        }
+    }
+    int cnt=0;
+    for(int i=1;i<N;i+=2){
+        if(lp[i]==i){
+            nimber[i]=++cnt;
+        }else{
+            nimber[i]=nimber[lp[i]];
+        }
+    }
     int t(1);
     cin >> t;
     while(t--)runcase();

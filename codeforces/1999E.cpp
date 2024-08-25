@@ -21,27 +21,21 @@ const db DINF=numeric_limits<db>::infinity();
 const db EPS=1e-9;
 const db PI=acos(db(-1));
 
+const int N=2e5+5;
+
+ll dp[N];
+
 void runcase(){
-    int n;
-    ll m;
-    cin >> n >> m;
-    vector<int> a(n);
-    for(auto &x:a)cin >> x;
-    sort(a.begin(),a.end());
-    ll sum=0,ans=0;
-    for(int l=0,r=0;l<n;l++){
-        while(r<n&&(sum+a[r]<=m&&a[r]-a[l]<=1)){
-            sum+=a[r];
-            r++;
-        }
-        ans=max(ans,sum);
-        sum-=a[l];
-    }
-    cout << ans << "\n";
+    int l,r;
+    cin >> l >> r;
+    cout << dp[r]+dp[l]-2*dp[l-1] << "\n";
 }
 
 int main(){
     cin.tie(nullptr)->sync_with_stdio(false);
+    dp[0]=0;
+    for(int i=1;i<N;i++)dp[i]=dp[i/3]+1;
+    for(int i=1;i<N;i++)dp[i]+=dp[i-1];
     int t(1);
     cin >> t;
     while(t--)runcase();

@@ -23,21 +23,11 @@ const db PI=acos(db(-1));
 
 void runcase(){
     int n;
-    ll m;
-    cin >> n >> m;
-    vector<int> a(n);
-    for(auto &x:a)cin >> x;
-    sort(a.begin(),a.end());
-    ll sum=0,ans=0;
-    for(int l=0,r=0;l<n;l++){
-        while(r<n&&(sum+a[r]<=m&&a[r]-a[l]<=1)){
-            sum+=a[r];
-            r++;
-        }
-        ans=max(ans,sum);
-        sum-=a[l];
-    }
-    cout << ans << "\n";
+    cin >> n;
+    vector<int> p(n);
+    for(auto &x:p)cin >> x,x--;
+    for(int i=0;i<n;i++)if(p[p[i]]==i)return void(cout << "2\n");
+    cout << "3\n";
 }
 
 int main(){

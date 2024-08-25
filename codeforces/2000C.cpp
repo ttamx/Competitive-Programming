@@ -23,21 +23,38 @@ const db PI=acos(db(-1));
 
 void runcase(){
     int n;
-    ll m;
-    cin >> n >> m;
+    cin >> n;
     vector<int> a(n);
-    for(auto &x:a)cin >> x;
-    sort(a.begin(),a.end());
-    ll sum=0,ans=0;
-    for(int l=0,r=0;l<n;l++){
-        while(r<n&&(sum+a[r]<=m&&a[r]-a[l]<=1)){
-            sum+=a[r];
-            r++;
-        }
-        ans=max(ans,sum);
-        sum-=a[l];
+    map<int,vector<int>> pos;
+    for(int i=0;i<n;i++){
+        cin >> a[i];
+        pos[a[i]].emplace_back(i);
     }
-    cout << ans << "\n";
+    int q;
+    cin >> q;
+    while(q--){
+        string s;
+        cin >> s;
+        if(s.size()!=n){
+            cout << "NO\n";
+            continue;
+        }
+        map<char,vector<int>> pos2;
+        for(int i=0;i<n;i++){
+            pos2[s[i]].emplace_back(i);
+        }
+        bool ok=true;
+        for(int i=0;i<n;i++){
+            if(!pos2[s[i]].empty()){
+                if(pos[a[i]]!=pos2[s[i]]){
+                    ok=false;
+                    break;
+                }
+                pos2[s[i]].clear();
+            }
+        }
+        cout << (ok?"YES":"NO") << "\n";
+    }
 }
 
 int main(){

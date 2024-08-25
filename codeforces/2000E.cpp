@@ -22,20 +22,33 @@ const db EPS=1e-9;
 const db PI=acos(db(-1));
 
 void runcase(){
-    int n;
-    ll m;
-    cin >> n >> m;
-    vector<int> a(n);
+    int n,m,k,w;
+    cin >> n >> m >> k >> w;
+    vector<ll> a(w);
     for(auto &x:a)cin >> x;
-    sort(a.begin(),a.end());
-    ll sum=0,ans=0;
-    for(int l=0,r=0;l<n;l++){
-        while(r<n&&(sum+a[r]<=m&&a[r]-a[l]<=1)){
-            sum+=a[r];
-            r++;
+    vector<vector<int>> b(n+1,vector<int>(m+1));
+    for(int i=0;i+k<=n;i++){
+        for(int j=0;j+k<=m;j++){
+            b[i][j]++;
+            b[i][j+k]--;
+            b[i+k][j]--;
+            b[i+k][j+k]++;
         }
-        ans=max(ans,sum);
-        sum-=a[l];
+    }
+    vector<ll> c;
+    for(int i=0;i<n;i++){
+        for(int j=0;j<m;j++){
+            if(i>0)b[i][j]+=b[i-1][j];
+            if(j>0)b[i][j]+=b[i][j-1];
+            if(i>0&&j>0)b[i][j]-=b[i-1][j-1];
+            c.emplace_back(b[i][j]);
+        }
+    }
+    sort(a.rbegin(),a.rend());
+    sort(c.rbegin(),c.rend());
+    ll ans=0;
+    for(int i=0;i<w;i++){
+        ans+=a[i]*c[i];
     }
     cout << ans << "\n";
 }

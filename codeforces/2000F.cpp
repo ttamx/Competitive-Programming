@@ -21,23 +21,37 @@ const db DINF=numeric_limits<db>::infinity();
 const db EPS=1e-9;
 const db PI=acos(db(-1));
 
+const int N=105;
+
+int dp[N][N][2*N];
+bool vis[N][N][2*N];
+
+int calc(int i,int j,int k){
+    if(k==0)return 0;
+    if(i==0||j==0||k>i+j)return INF;
+    if(i==1&&j==1)return 1;
+    if(vis[i][j][k])return dp[i][j][k];
+    vis[i][j][k]=true;
+    return dp[i][j][k]=min(calc(i-1,j,k-1)+j,calc(i,j-1,k-1)+i);
+}
+
 void runcase(){
-    int n;
-    ll m;
-    cin >> n >> m;
-    vector<int> a(n);
-    for(auto &x:a)cin >> x;
-    sort(a.begin(),a.end());
-    ll sum=0,ans=0;
-    for(int l=0,r=0;l<n;l++){
-        while(r<n&&(sum+a[r]<=m&&a[r]-a[l]<=1)){
-            sum+=a[r];
-            r++;
+    int n,k;
+    cin >> n >> k;
+    vector<int> dp(k+1,INF);
+    dp[0]=0;
+    for(int i=0;i<n;i++){
+        int a,b;
+        cin >> a >> b;
+        auto ndp=dp;
+        for(int i=0;i<=k;i++){
+            for(int j=0;j<=min(a+b,i);j++){
+                ndp[i]=min(ndp[i],dp[i-j]+calc(a,b,j));
+            }
         }
-        ans=max(ans,sum);
-        sum-=a[l];
+        swap(dp,ndp);
     }
-    cout << ans << "\n";
+    cout << (dp[k]<INF?dp[k]:-1) << "\n";
 }
 
 int main(){
