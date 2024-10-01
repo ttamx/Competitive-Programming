@@ -89,7 +89,8 @@ int main(int argc, const char ** argv) {
             }
             // printf("A %d %d %d\n", i, sets[i], sum);
             if ((sets[i] == 0 && sum) || (sets[i] == 1 && (sum == 0) )) {
-                printf("val:%d need:%d found:%d\n",i,sets[i],sum);
+                cout << "val:" << bitset<20>(i) << " ";
+                printf("need:%d found:%d\n",sets[i],sum);
                 invalid = 1;
                 break;
             }            

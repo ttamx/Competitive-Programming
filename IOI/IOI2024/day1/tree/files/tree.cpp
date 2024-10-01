@@ -3,19 +3,36 @@
 using namespace std;
 
 using ll = long long;
-using pii = pair<int,int>;
 
 const int N=2e5+5;
+const int W=1e6+5;
 
 int n,m;
 int p[N];
-ll w[N],tot[N];
-map<ll,ll> pq[N];
-ll val[N];
+ll w[N];
 vector<int> adj[N];
 bool vis[N];
-vector<ll> a,qs;
-ll leaf;
+ll base;
+int pa[N],sz[N];
+vector<pair<int,int>> event;
+ll cnt[W],qs1[W],qs2[W];
+bool alive[N];
+
+int fp(int u){
+    return pa[u]=u==pa[u]?u:fp(pa[u]);
+}
+
+void uni(int u,int v){
+    u=fp(u),v=fp(v);
+    if(u==v){
+        return;
+    }
+    pa[v]=u;
+    sz[u]+=sz[v];
+    if(alive[v]){
+        alive[u]=true;
+    }
+}
 
 int dfs(int u){
     vis[u]=true;
@@ -29,46 +46,50 @@ int dfs(int u){
     return max(cnt,1);
 }
 
-void init(vector<int> P,vector<int> W){
-    n=P.size();
+void init(vector<int> _p,vector<int> _w){
+    n=_p.size();
     for(int i=0;i<n;i++){
-        p[i]=P[i];
-        w[i]=W[i];
+        p[i]=_p[i];
+        w[i]=_w[i];
         if(i>0){
             adj[p[i]].emplace_back(i);
         }
     }
     for(int i=0;i<n;i++){
-        if(!vis[i]){
-            int cnt=dfs(i);
-            if(w[i]>0){
-                a.emplace_back(cnt);
+        pa[i]=i;
+        sz[i]=1;
+        if(adj[i].empty()){
+            base+=w[i];
+        }else{
+            event.emplace_back(w[i],i);
+        }
+    }
+    sort(event.rbegin(),event.rend());
+    for(auto [t,u]:event){
+        vis[u]=true;
+        if(alive[fp(u)]){
+            cnt[sz[fp(u)]]-=t;
+        }
+        sz[fp(u)]--;
+        for(auto v:adj[u]){
+            if(alive[fp(v)]){
+                cnt[sz[fp(v)]]-=t;
             }
+            uni(u,v);
         }
+        cnt[sz[fp(u)]]+=t;
+        alive[fp(u)]=true;
     }
-    for(int i=0;i<n;i++){
-        if(adj[i].size()==0&&w[i]>0){
-            leaf++;
-        }
-    }
-    sort(a.begin(),a.end());
-    qs=a;
-    for(int i=1;i<qs.size();i++){
-        qs[i]+=qs[i-1];
+    for(int i=1;i<W;i++){
+        qs1[i]=qs1[i-1]+cnt[i];
+        qs2[i]=qs2[i-1]+cnt[i]*i;
     }
 }
 
 ll query(int L,int R){
-    ll ans=leaf*L;
-    int idx=upper_bound(a.begin(),a.end(),R/L)-a.begin();
-    if(idx<a.size()){
-        ll val=qs.back();
-        if(idx>0){
-            val-=qs[idx-1];
-        }
-        val*=L;
-        val-=1LL*(a.size()-idx)*R;
-        ans+=val;
-    }
+    ll ans=base*L;
+    int k=R/L;
+    ans+=(qs2[W-1]-qs2[k])*L;
+    ans-=(qs1[W-1]-qs1[k])*R;
     return ans;
 }

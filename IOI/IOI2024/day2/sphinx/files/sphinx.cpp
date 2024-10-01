@@ -5,13 +5,8 @@ using namespace std;
 
 vector<int> find_colours(int n,vector<int> X,vector<int> Y){
     int m=X.size();
-    vector<int> ans(n);
-    vector<vector<int>> adj(n);
-    for(int i=0;i<m;i++){
-        adj[X[i]].emplace_back(Y[i]);
-        adj[Y[i]].emplace_back(X[i]);
-    }
-    auto count_n=[&](vector<int> col){
+    vector<int> ans(n,-1);
+    auto count_col=[&](vector<int> a,int col){
         vector<int> pa(n);
         iota(pa.begin(),pa.end(),0);
         function<int(int)> fp=[&](int u){
@@ -24,22 +19,25 @@ vector<int> find_colours(int n,vector<int> X,vector<int> Y){
             }
         };
         for(int i=0;i<m;i++){
-            if(col[X[i]]==n&&col[Y[i]]==n){
+            if(a[X[i]]==col&&a[Y[i]]==col){
                 uni(X[i],Y[i]);
             }
         }
         int res=0;
         for(int i=0;i<n;i++){
-            if(col[i]==n&&fp(i)==i){
+            if(a[i]==col&&fp(i)==i){
                 res++;
             }
         }
         return res;
     };
-    auto query=[&](vector<int> a){
-        return perform_experiment(a)-count_n(a);
+    auto query=[&](vector<int> a,int col){
+        int res=perform_experiment(a)-count_col(a,col);
+        if(col!=n){
+            res-=count_col(a,n);
+        }
+        return res;
     };
-    vector<bool> vis(n);
     int comp_cnt=0;
     vector<int> pa(n);
     iota(pa.begin(),pa.end(),0);
@@ -53,79 +51,147 @@ vector<int> find_colours(int n,vector<int> X,vector<int> Y){
             comp_cnt--;
         }
     };
-    int node_cnt=0;
     vector<int> filter(n,n);
-    function<void(int)> dfs=[&](int u){
-        node_cnt++,comp_cnt++;
+    for(int u=0;u<n;u++){
+        comp_cnt++;
         filter[u]=-1;
-        int res=query(filter);
+        int res=query(filter,n);
         int k=comp_cnt-res;
-        vector<int> same;
+        vector<int> same,cand;
+        for(int i=0;i<u;i++){
+            if(fp(i)==i){
+                cand.emplace_back(i);
+            }
+        }
         for(int i=0,p=0;i<k;i++){
-            int l=p,r=n-1;
+            int l=p,r=cand.size()-1;
             while(l<r){
                 int m=(l+r)/2;
                 vector<int> tmp(n,n);
                 int cnt=0;
-                for(int j=0;j<n;j++){
-                    if(vis[j]){
-                        if(p<=fp(j)&&fp(j)<=m){
-                            if(fp(j)==j){
-                                cnt++;
-                            }
-                        }else{
-                            tmp[j]=-1;
+                for(int j=0;j<u;j++){
+                    if(cand[p]<=fp(j)&&fp(j)<=cand[m]){
+                        if(fp(j)==j){
+                            cnt++;
                         }
+                    }else{
+                        tmp[j]=-1;
                     }
                 }
                 tmp[u]=-1;
-                if(query(tmp)!=res-cnt){
+                if(query(tmp,n)!=res-cnt){
                     r=m;
                 }else{
                     l=m+1;
                 }
             }
-            vector<int> tmp(n,n);
-            int cnt=0;
-            for(int j=0;j<n;j++){
-                if(vis[j]&&(fp(j)>l||fp(j)<p)){
-                    tmp[j]=-1;
-                    if(fp(j)==j){
-                        cnt++;
-                    }
-                }
-            }
-            tmp[u]=-1;
-            same.emplace_back(l);
+            same.emplace_back(cand[l]);
             p=l+1;
         }
-        vis[u]=true;
         for(auto x:same){
             uni(u,x);
         }
-        for(auto v:adj[u]){
-            if(!vis[v]){
-                dfs(v);
-            }
-        }
-    };
-    dfs(0);
+    }
     set<pair<int,int>> edge;
     for(int i=0;i<m;i++){
         int u=fp(X[i]),v=fp(Y[i]);
         if(u>v){
             swap(u,v);
         }
-        edge.emplace(u,v);
+        if(u!=v){
+            edge.emplace(u,v);
+        }
     }
-    vector<vector<int>> adj2(n);
+    vector<vector<int>> adj(n);
     for(auto [u,v]:edge){
-        adj2[u].emplace_back(v);
-        adj2[v].emplace_back(u);
+        adj[u].emplace_back(v);
+        adj[v].emplace_back(u);
     }
-    int root=fp(0);
+    vector<vector<int>> comp(n);
     for(int i=0;i<n;i++){
-        ans[i]=fp(i);
+        comp[fp(i)].emplace_back(i);
+    }
+    vector<bool> vis(n);
+    vector<vector<int>> node(2);
+    int node_cnt=0;
+    function<void(int,int)> dfs=[&](int u,int c){
+        node_cnt++;
+        vis[u]=true;
+        node[c].emplace_back(u);
+        for(auto v:adj[u]){
+            if(!vis[v]){
+                dfs(v,c^1);
+            }
+        }
+    };
+    for(auto &x:node){
+        sort(x.begin(),x.end());
+    }
+    dfs(fp(0),0);
+    auto paint=[&](vector<int> &a,int i,int col){
+        for(auto x:comp[i]){
+            a[x]=col;
+        }
+    };
+    if(node_cnt==1){
+        for(int i=0;i<n;i++){
+            vector<int> tmp(n,i);
+            tmp[0]=-1;
+            if(perform_experiment(tmp)==1){
+                return vector<int>(n,i);
+            }
+        }
+        assert(false);
+    }
+    vector<vector<int>> pos(2);
+    for(int i=0;i<2;i++){
+        int k=node[i].size();
+        pos[i].resize(k);
+        iota(pos[i].begin(),pos[i].end(),0);
+    }
+    for(int col=0;col<n;col++){
+        for(int t=0;t<2;t++){
+            vector<int> filter(n,col);
+            for(auto i:node[t]){
+                paint(filter,i,-1);
+            }
+            vector<int> found;
+            for(int i=0;i<pos[t].size();i++){
+                for(int j=0;j<pos[t][i];j++){
+                    paint(filter,node[t][j],n);
+                }
+                if(query(filter,col)==node[t].size()-pos[t][i]){
+                    break;
+                }
+                int l=i,r=pos[t].size()-1;
+                while(l<r){
+                    int m=(l+r)/2;
+                    vector<int> tmp(n,col);
+                    for(int j=0;j<node[t].size();j++){
+                        if(j<pos[t][i]||pos[t][m]<j){
+                            paint(tmp,node[t][j],n);
+                        }else{
+                            paint(tmp,node[t][j],-1);
+                        }
+                    }
+                    if(query(tmp,col)!=pos[t][m]-pos[t][i]+1){
+                        r=m;
+                    }else{
+                        l=m+1;
+                    }
+                }
+                ans[node[t][pos[t][l]]]=col;
+                found.emplace_back(pos[t][l]);
+                i=l;
+            }
+            for(auto i:found){
+                pos[t].erase(lower_bound(pos[t].begin(),pos[t].end(),i));
+            }
+        }
+    }
+    for(int i=0;i<n;i++){
+        ans[i]=ans[fp(i)];
+        assert(ans[i]!=-1);
     }
     return ans;
 }

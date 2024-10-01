@@ -101,6 +101,7 @@
         "spanstream": "cpp",
         "stdfloat": "cpp",
         "stop_token": "cpp",
-        "syncstream": "cpp"
+        "syncstream": "cpp",
+        "__node_handle": "cpp"
     }
 }
