@@ -102,6 +102,10 @@
         "stdfloat": "cpp",
         "stop_token": "cpp",
         "syncstream": "cpp",
-        "__node_handle": "cpp"
+        "__node_handle": "cpp",
+        "__verbose_abort": "cpp",
+        "print": "cpp",
+        "generator": "cpp",
+        "text_encoding": "cpp"
     }
 }
