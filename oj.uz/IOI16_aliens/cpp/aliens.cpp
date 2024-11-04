@@ -16,8 +16,6 @@ ll overlap[N];
 int mn[M];
 stack<pair<int,int>> s;
 
-bool querymode=false;
-
 struct line{
     ll m,c;
     int cnt;

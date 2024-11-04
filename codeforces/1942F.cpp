@@ -1,25 +1,36 @@
-#include<bits/stdc++.h>
-#define sz(x) (int)(x).size()
-#define all(x) (x).begin(),(x).end()
-#define rall(x) (x).rbegin(),(x).rend()
+#include "template.hpp"
+#include "data-structure/segment-tree/segment-tree.hpp"
+#include "group/monoid/monoid-base.hpp"
 
-using namespace std;
+using i128 = __int128_t;
 
-using ll = long long;
-using db = long double;
-using vi = vector<int>;
-using vl = vector<ll>;
-using vd = vector<db>;
-using pii = pair<int,int>;
-using pll = pair<ll,ll>;
-using pdd = pair<db,db>;
-const int INF=0x3fffffff;
-// const int MOD=1000000007;
-const int MOD=998244353;
-const ll LINF=0x1fffffffffffffff;
-const db DINF=numeric_limits<db>::infinity();
-const db EPS=1e-9;
-const db PI=acos(db(-1));
+const int B=10;
+
+struct Info{
+    ll threshold,val1,val2;
+    Info():threshold(0LL),val1(0LL),val2(0LL){}
+    Info(ll t,ll v1,ll v2):threshold(t),val1(v1),val2(v2){}
+};
+
+Info combine(Info l,Info r){
+    Info res;
+    res.threshold=l.threshold;
+    if(l.val1>=r.threshold){
+        res.val1=res.val2=r.val2;
+    }else if(l.val2>=r.threshold){
+        res.val1=r.val1;
+        res.val2=r.val2;
+    }else{
+        res.val1=res.val2=r.val1;
+    }
+    return res;
+}
+
+Info iden(){
+    return Info();
+}
+
+using Monoid = MonoidBase<Info,combine,iden>;
 
 ll sqr(ll x){
     ll l=0,r=INF;
@@ -31,21 +42,44 @@ ll sqr(ll x){
     return l;
 }
 
-int main(){
-    cin.tie(nullptr)->sync_with_stdio(false);
+void runcase(){
     int n,q;
     cin >> n >> q;
-    vl a(n);
-    for(auto &x:a)cin >> x;
-    while(q--){
-        int k;
-        ll x;
-        cin >> k >> x;
-        a[k-1]=x;
-        ll res=0;
-        for(int i=max(0,n-100);i<n;i++){
-            res=sqr(res+a[i]);
-        }
-        cout << res << "\n";
+    int offset=(B-n%B)%B;
+    n+=offset;
+    vector<ll> a(n);
+    for(int i=offset;i<n;i++){
+        cin >> a[i];
     }
+    int m=n/B;
+    SegmentTree<Monoid> seg(m);
+    auto calc=[&](int i){
+        ll val=0;
+        for(int j=0;j<B;j++){
+            val=sqr(val+a[i*B+j]);
+        }
+        ll threshold=val+1;
+        for(int j=B-1;j>=0;j--){
+            threshold=min((i128)LINF,(i128)threshold*threshold-a[i*B+j]);
+        }
+        seg.modify(i,Info(threshold,val,val+1));
+    };
+    for(int i=0;i<m;i++){
+        calc(i);
+    }
+    while(q--){
+        int x;
+        ll v;
+        cin >> x >> v;
+        x+=offset-1;
+        a[x]=v;
+        calc(x/B);
+        cout << seg.query(0,m-1).val1 << "\n";
+    }
+}
+
+int main(){
+    cin.tie(nullptr)->sync_with_stdio(false);
+    int t(1);
+    while(t--)runcase();
 }

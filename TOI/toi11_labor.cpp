@@ -1,25 +1,36 @@
-#include<bits/stdc++.h>
-
+#include <bits/stdc++.h>
+#include <stdio.h>
 using namespace std;
+#define ll long long int
+ll ar[1000000];
+ll N,M;
+int check(ll mid) {
+    ll a = 0;
+    for (int i=0;i<M;i++) {
+        a+=mid/ar[i];
+    }
+    if (a>=N) {
+        return 1;
+    } else {
+        return 0;
+    }
+}
+int main() {
+    cin>>M>>N;
+    for (int i=0;i<M;i++) {
+        cin >> ar[i];
+    }
+    ll l = 0;
+    ll r = 1e11;
 
-typedef long long ll;
-
-const ll M=1e6+5;
-
-ll n,m;
-ll t[M];
-
-int main(){
-    cin.tie(nullptr)->sync_with_stdio(false);
-    cin >> m >> n;
-    for(int i=1;i<=m;i++)cin >> t[i];
-    ll l=1,r=1e18;
-    while(l<r){
-        ll mid=(l+r)/2;
-        ll cnt=0;
-        for(int i=1;i<=m;i++)cnt+=mid/t[i];
-        if(cnt<n)l=mid+1;
-        else r=mid;
+    while (l<r) {
+        ll mid = (l+r)/2;
+        if (check(mid)) {
+            r = mid;
+        } else {
+            l = mid+1;
+        }
     }
     cout << l;
+
 }

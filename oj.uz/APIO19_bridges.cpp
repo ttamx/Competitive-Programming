@@ -5,7 +5,7 @@ using namespace std;
 const int N=50005;
 const int M=1e5+5;
 const int Q=1e5+5;
-const int K=633;
+const int K=1000;
 
 int n,m,q;
 int ans[Q];

@@ -4,18 +4,16 @@
 using namespace std;
 
 typedef long long ll;
-typedef pair<ll,ll> p2;
 
 const int N=750005;
 const int K=1<<21;
 
 int n,q;
 ll h[N];
-int lg[N];
 int ql[N],qr[N];
 vector<int> qry[N];
 vector<ll> ans;
-p2 sp[20][N];
+pair<int,int> sp[20][N];
 
 struct lichaotree{
 	struct line{
@@ -75,8 +73,8 @@ struct lichaotree{
 	}
 }lctl,lctr;
 
-p2 rmq(int l,int r){
-	int k=lg[r-l+1];
+pair<int,int> rmq(int l,int r){
+	int k=31-__builtin_clz(r-l+1);
 	return max(sp[k][l],sp[k][r-(1<<k)+1]);
 }
 
@@ -102,10 +100,9 @@ vector<ll> minimum_costs(vector<int> H, vector<int> L, vector<int> R) {
 	ans.resize(q);
 	for(int i=1;i<=n;i++){
 		h[i]=H[i-1];
-		sp[0][i]=p2(h[i],i);
+		sp[0][i]=pair<int,int>(h[i],i);
 	}
-	for(int i=2;i<=n;i++)lg[i]=lg[i/2]+1;
-	for(int i=1;i<=lg[n];i++){
+	for(int i=1;i<20;i++){
 		for(int j=1;j+(1<<i)-1<=n;j++){
 			sp[i][j]=max(sp[i-1][j],sp[i-1][j+(1<<(i-1))]);
 		}
