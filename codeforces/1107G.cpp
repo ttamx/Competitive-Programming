@@ -31,42 +31,51 @@ mt19937_64 rng64(chrono::steady_clock::now().time_since_epoch().count());
 
 void runcase(){
     int n;
-    cin >> n;
-    vector<int> a(n),p(n);
-    for(auto &x:a){
-        cin >> x;
+    ll a;
+    cin >> n >> a;
+    vector<ll> d(n),c(n);
+    for(int i=0;i<n;i++){
+        cin >> d[i] >> c[i];
     }
-    for(auto &x:p){
-        cin >> x;
-        x--;
+    vector<int> p(n);
+    vector<ll> sum(n),pre(n),suf(n),dp(n);
+    iota(p.begin(),p.end(),0);
+    function<int(int)> fp=[&](int u){
+        return p[u]=u==p[u]?u:fp(p[u]);
+    };
+    auto uni=[&](int u,int v){
+        u=fp(u),v=fp(v);
+        ll nsum=sum[u]+sum[v];
+        ll npre=max(pre[u],sum[u]+pre[v]);
+        ll nsuf=max(suf[v],sum[v]+suf[u]);
+        ll ndp=max({dp[u],dp[u],suf[u]+pre[v]});
+        sum[u]=nsum;
+        pre[u]=npre;
+        suf[u]=nsuf;
+        dp[u]=ndp;
+        p[v]=u;
+    };
+    vector<pair<ll,int>> event;
+    for(int i=0;i+1<n;i++){
+        event.emplace_back((d[i+1]-d[i])*(d[i+1]-d[i]),i);
     }
-    ll ans=0,ans2=0;
-    multiset<ll> cur,cand;
-    for(auto x:a){
-        cand.emplace(x);
+    sort(event.begin(),event.end());
+    ll ans=0;
+    for(int i=0;i<n;i++){
+        ll val=a-c[i];
+        ans=max(ans,val);
+        sum[i]=val;
+        pre[i]=suf[i]=dp[i]=max(val,0LL);
     }
-    for(int k=0;k*2+1<=n;k++){
-        while(cur.size()<k+1){
-            cur.emplace(*cand.rbegin());
-            cand.erase(prev(cand.end()));
-        }
-        ll res=1LL*(k+1)*(*cur.begin());
-        if(res>ans){
-            ans=res;
-            ans2=k+1;
-        }
-        if(cur.count(a[p[k]])){
-            cur.erase(cur.find(a[p[k]]));
-        }else{
-            cand.erase(cand.find(a[p[k]]));
-        }
+    for(auto [w,i]:event){
+        uni(i,i+1);
+        ans=max(ans,dp[fp(i)]-w);
     }
-    cout << ans << " " << ans2 << "\n";
+    cout << ans << "\n";
 }
 
 int main(){
     cin.tie(nullptr)->sync_with_stdio(false);
     int t(1);
-    cin >> t;
     while(t--)runcase();
 }

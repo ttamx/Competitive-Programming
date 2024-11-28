@@ -30,38 +30,38 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 mt19937_64 rng64(chrono::steady_clock::now().time_since_epoch().count());
 
 void runcase(){
-    int n;
-    cin >> n;
-    vector<int> a(n),p(n);
-    for(auto &x:a){
-        cin >> x;
+    int n,k;
+    cin >> n >> k;
+    vector<vector<int>> adj(n);
+    for(int i=0;i<n-1;i++){
+        int u,v;
+        cin >> u >> v;
+        u--,v--;
+        adj[u].emplace_back(v);
+        adj[v].emplace_back(u);
     }
-    for(auto &x:p){
-        cin >> x;
-        x--;
-    }
-    ll ans=0,ans2=0;
-    multiset<ll> cur,cand;
-    for(auto x:a){
-        cand.emplace(x);
-    }
-    for(int k=0;k*2+1<=n;k++){
-        while(cur.size()<k+1){
-            cur.emplace(*cand.rbegin());
-            cand.erase(prev(cand.end()));
+    vector<int> par(n,-1),sz(n);
+    function<void(int)> dfs=[&](int u){
+        sz[u]=1;
+        for(auto v:adj[u]){
+            if(v==par[u])continue;
+            par[v]=u;
+            dfs(v);
+            sz[u]+=sz[v];
         }
-        ll res=1LL*(k+1)*(*cur.begin());
-        if(res>ans){
-            ans=res;
-            ans2=k+1;
-        }
-        if(cur.count(a[p[k]])){
-            cur.erase(cur.find(a[p[k]]));
-        }else{
-            cand.erase(cand.find(a[p[k]]));
+    };
+    dfs(0);
+    vector<int> a;
+    for(int u=par[n-1],c=n-1;u!=-1;c=u,u=par[u]){
+        for(auto v:adj[u]){
+            if(v!=c){
+                a.emplace_back(sz[v]);
+            }
         }
     }
-    cout << ans << " " << ans2 << "\n";
+    sort(a.rbegin(),a.rend());
+    a.resize(k-1);
+    cout << n-sz[n-1]+1-accumulate(a.begin(),a.end(),0) << "\n";
 }
 
 int main(){

@@ -32,41 +32,55 @@ mt19937_64 rng64(chrono::steady_clock::now().time_since_epoch().count());
 void runcase(){
     int n;
     cin >> n;
-    vector<int> a(n),p(n);
+    vector<vector<int>> a(n,vector<int>(n));
     for(auto &x:a){
-        cin >> x;
-    }
-    for(auto &x:p){
-        cin >> x;
-        x--;
-    }
-    ll ans=0,ans2=0;
-    multiset<ll> cur,cand;
-    for(auto x:a){
-        cand.emplace(x);
-    }
-    for(int k=0;k*2+1<=n;k++){
-        while(cur.size()<k+1){
-            cur.emplace(*cand.rbegin());
-            cand.erase(prev(cand.end()));
-        }
-        ll res=1LL*(k+1)*(*cur.begin());
-        if(res>ans){
-            ans=res;
-            ans2=k+1;
-        }
-        if(cur.count(a[p[k]])){
-            cur.erase(cur.find(a[p[k]]));
-        }else{
-            cand.erase(cand.find(a[p[k]]));
+        string s;
+        cin >> s;
+        for(int i=0;i<n;i+=4){
+            int v;
+            if(isdigit(s[i/4])){
+                v=s[i/4]-'0';
+            }else{
+                v=s[i/4]-'A'+10;
+            }
+            for(int j=0;j<4;j++){
+                x[i+j]=(v>>(3-j))&1;
+            }
         }
     }
-    cout << ans << " " << ans2 << "\n";
+    for(int i=0;i<n;i++){
+        for(int j=0;j<n;j++){
+            if(i>0)a[i][j]+=a[i-1][j];
+            if(j>0)a[i][j]+=a[i][j-1];
+            if(i>0&&j>0)a[i][j]-=a[i-1][j-1];
+        }
+    }
+    for(int d=n;d>=2;d--){
+        if(n%d)continue;
+        bool ok=true;
+        for(int i=d-1;i<n;i+=d){
+            for(int j=d-1;j<n;j+=d){
+                int sum=a[i][j];
+                if(i>=d)sum-=a[i-d][j];
+                if(j>=d)sum-=a[i][j-d];
+                if(i>=d&&j>=d)sum+=a[i-d][j-d];
+                if(sum!=0&&sum!=d*d){
+                    ok=false;
+                    break;
+                }
+            }
+            if(!ok)break;
+        }
+        if(ok){
+            cout << d << "\n";
+            return;
+        }
+    }
+    cout << 1 << "\n";
 }
 
 int main(){
     cin.tie(nullptr)->sync_with_stdio(false);
     int t(1);
-    cin >> t;
     while(t--)runcase();
 }

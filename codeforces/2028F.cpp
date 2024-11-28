@@ -29,39 +29,35 @@ using ordered_multiset = tree<T,null_type,less_equal<T>,rb_tree_tag,tree_order_s
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 mt19937_64 rng64(chrono::steady_clock::now().time_since_epoch().count());
 
+const int M=10001;
+
+using DS = bitset<M>;
+
 void runcase(){
-    int n;
-    cin >> n;
-    vector<int> a(n),p(n);
-    for(auto &x:a){
+    int n,m;
+    cin >> n >> m;
+    vector<pair<ll,DS>> dp;
+    dp.emplace_back(1,DS());
+    dp[0].second[0]=1;
+    int consec=0;
+    for(int i=0;i<n;i++){
+        int x;
         cin >> x;
-    }
-    for(auto &x:p){
-        cin >> x;
-        x--;
-    }
-    ll ans=0,ans2=0;
-    multiset<ll> cur,cand;
-    for(auto x:a){
-        cand.emplace(x);
-    }
-    for(int k=0;k*2+1<=n;k++){
-        while(cur.size()<k+1){
-            cur.emplace(*cand.rbegin());
-            cand.erase(prev(cand.end()));
+        vector<pair<ll,DS>> ndp;
+        DS cur;
+        for(auto &[add,bs]:dp){
+            add=min(add*x,(ll)m+1);
+            if(!ndp.empty()&&ndp.back().first==add){
+                ndp.back().second|=bs;
+            }else{
+                ndp.emplace_back(add,bs);
+            }
+            cur|=bs<<add;
         }
-        ll res=1LL*(k+1)*(*cur.begin());
-        if(res>ans){
-            ans=res;
-            ans2=k+1;
-        }
-        if(cur.count(a[p[k]])){
-            cur.erase(cur.find(a[p[k]]));
-        }else{
-            cand.erase(cand.find(a[p[k]]));
-        }
+        ndp.emplace_back(1,cur);
+        dp=move(ndp);
     }
-    cout << ans << " " << ans2 << "\n";
+    cout << (dp.back().second[m]?"YES":"NO") << "\n";
 }
 
 int main(){

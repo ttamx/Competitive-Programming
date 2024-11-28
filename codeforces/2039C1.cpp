@@ -30,38 +30,17 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 mt19937_64 rng64(chrono::steady_clock::now().time_since_epoch().count());
 
 void runcase(){
-    int n;
-    cin >> n;
-    vector<int> a(n),p(n);
-    for(auto &x:a){
-        cin >> x;
-    }
-    for(auto &x:p){
-        cin >> x;
-        x--;
-    }
-    ll ans=0,ans2=0;
-    multiset<ll> cur,cand;
-    for(auto x:a){
-        cand.emplace(x);
-    }
-    for(int k=0;k*2+1<=n;k++){
-        while(cur.size()<k+1){
-            cur.emplace(*cand.rbegin());
-            cand.erase(prev(cand.end()));
-        }
-        ll res=1LL*(k+1)*(*cur.begin());
-        if(res>ans){
-            ans=res;
-            ans2=k+1;
-        }
-        if(cur.count(a[p[k]])){
-            cur.erase(cur.find(a[p[k]]));
-        }else{
-            cand.erase(cand.find(a[p[k]]));
+    ll x,m;
+    cin >> x >> m;
+    int ans=0;
+    for(int y=1;y<=min(2*x,m);y++){
+        if(y==x)continue;
+        int z=x^y;
+        if(x%z==0||y%z==0){
+            ans++;
         }
     }
-    cout << ans << " " << ans2 << "\n";
+    cout << ans << "\n";
 }
 
 int main(){

@@ -32,41 +32,52 @@ mt19937_64 rng64(chrono::steady_clock::now().time_since_epoch().count());
 void runcase(){
     int n;
     cin >> n;
-    vector<int> a(n),p(n);
-    for(auto &x:a){
+    vector<int> p(n,-1);
+    for(int i=1;i<n;i++){
+        cin >> p[i];
+        p[i]--;
+    }
+    using Info = pair<array<int,2>,pair<int,int>>;
+    vector<array<int,2>> a(n,{0,0});
+    for(int i=0;i<n;i++){
+        int x;
         cin >> x;
+        a[i][x]=1;
     }
-    for(auto &x:p){
-        cin >> x;
-        x--;
-    }
-    ll ans=0,ans2=0;
-    multiset<ll> cur,cand;
-    for(auto x:a){
-        cand.emplace(x);
-    }
-    for(int k=0;k*2+1<=n;k++){
-        while(cur.size()<k+1){
-            cur.emplace(*cand.rbegin());
-            cand.erase(prev(cand.end()));
+    struct Cmp{
+        bool operator()(const Info &l,const Info &r)const{
+            return 1LL*l.first[0]*r.first[1]<1LL*r.first[0]*l.first[1];
         }
-        ll res=1LL*(k+1)*(*cur.begin());
-        if(res>ans){
-            ans=res;
-            ans2=k+1;
-        }
-        if(cur.count(a[p[k]])){
-            cur.erase(cur.find(a[p[k]]));
-        }else{
-            cand.erase(cand.find(a[p[k]]));
+    };
+    vector<int> ver(n);
+    priority_queue<Info,vector<Info>,Cmp> pq;
+    for(int i=1;i<n;i++){
+        pq.emplace(a[i],make_pair(i,0));
+    }
+    vector<int> fa(n);
+    iota(fa.begin(),fa.end(),0);
+    function<int(int)> fp=[&](int u){
+        return fa[u]=(u==fa[u]?u:fp(fa[u]));
+    };
+    ll ans=0;
+    while(!pq.empty()){
+        auto [u,t]=pq.top().second;
+        pq.pop();
+        if(t<ver[u])continue;
+        int v=fp(p[u]);
+        ans+=1LL*a[v][1]*a[u][0];
+        a[v][0]+=a[u][0];
+        a[v][1]+=a[u][1];
+        fa[u]=v;
+        if(p[v]!=-1){
+            pq.emplace(a[v],make_pair(v,++ver[v]));
         }
     }
-    cout << ans << " " << ans2 << "\n";
+    cout << ans << "\n";
 }
 
 int main(){
     cin.tie(nullptr)->sync_with_stdio(false);
     int t(1);
-    cin >> t;
     while(t--)runcase();
 }

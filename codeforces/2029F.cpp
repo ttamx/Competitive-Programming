@@ -32,36 +32,52 @@ mt19937_64 rng64(chrono::steady_clock::now().time_since_epoch().count());
 void runcase(){
     int n;
     cin >> n;
-    vector<int> a(n),p(n);
-    for(auto &x:a){
-        cin >> x;
-    }
-    for(auto &x:p){
-        cin >> x;
-        x--;
-    }
-    ll ans=0,ans2=0;
-    multiset<ll> cur,cand;
-    for(auto x:a){
-        cand.emplace(x);
-    }
-    for(int k=0;k*2+1<=n;k++){
-        while(cur.size()<k+1){
-            cur.emplace(*cand.rbegin());
-            cand.erase(prev(cand.end()));
-        }
-        ll res=1LL*(k+1)*(*cur.begin());
-        if(res>ans){
-            ans=res;
-            ans2=k+1;
-        }
-        if(cur.count(a[p[k]])){
-            cur.erase(cur.find(a[p[k]]));
-        }else{
-            cand.erase(cand.find(a[p[k]]));
+    string s;
+    cin >> s;
+    for(int i=0;i<n;i++){
+        if(s[i]=='B'&&s[(i+1)%n]=='B'){
+            for(auto &x:s){
+                x=(x=='R'?'B':'R');
+            }
+            break;
         }
     }
-    cout << ans << " " << ans2 << "\n";
+    for(int i=0;i<n;i++){
+        if(s[i]=='B'&&s[(i+1)%n]=='B'){
+            cout << "NO\n";
+            return;
+        }
+    }
+    if(s==string(n,'R')){
+        cout << "YES\n";
+        return;
+    }
+    for(int i=0;i<n;i++){
+        if(s[i]=='B'){
+            rotate(s.begin(),s.begin()+i,s.end());
+            break;
+        }
+    }
+    int cnt=0;
+    int block=0;
+    for(int i=1;i<n;i++){
+        block++;
+        int j=i;
+        while(j<n&&s[j]=='R'){
+            j++;
+        }
+        if((j-i)%2==0){
+            cnt++;
+        }
+        i=j;
+    }
+    if(block==1){
+        cout << "YES\n";
+    }else if(cnt==0){
+        cout << (n%2==1?"YES":"NO") << "\n";
+    }else{
+        cout << (cnt==1?"YES":"NO") << "\n";
+    }
 }
 
 int main(){

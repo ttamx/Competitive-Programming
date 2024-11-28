@@ -29,43 +29,56 @@ using ordered_multiset = tree<T,null_type,less_equal<T>,rb_tree_tag,tree_order_s
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 mt19937_64 rng64(chrono::steady_clock::now().time_since_epoch().count());
 
+const int K=650;
+const int N=4e5+5;
+
+int lp[N];
+vector<int> adj[N];
+bitset<N> vis[K];
+
 void runcase(){
     int n;
     cin >> n;
-    vector<int> a(n),p(n);
+    vector<int> a(n);
     for(auto &x:a){
         cin >> x;
+        if(x%2==1&&x!=lp[x]){
+            x-=lp[x];
+        }
     }
-    for(auto &x:p){
-        cin >> x;
-        x--;
-    }
-    ll ans=0,ans2=0;
-    multiset<ll> cur,cand;
+    int pr=-1;
     for(auto x:a){
-        cand.emplace(x);
-    }
-    for(int k=0;k*2+1<=n;k++){
-        while(cur.size()<k+1){
-            cur.emplace(*cand.rbegin());
-            cand.erase(prev(cand.end()));
-        }
-        ll res=1LL*(k+1)*(*cur.begin());
-        if(res>ans){
-            ans=res;
-            ans2=k+1;
-        }
-        if(cur.count(a[p[k]])){
-            cur.erase(cur.find(a[p[k]]));
-        }else{
-            cand.erase(cand.find(a[p[k]]));
+        if(lp[x]==x){
+            if(pr==-1){
+                pr=x;
+            }else if(pr!=x){
+                cout << -1 << "\n";
+                return;
+            }
         }
     }
-    cout << ans << " " << ans2 << "\n";
+    if(pr==-1){
+        pr=2;
+    }
+    for(auto x:a){
+        if(x!=pr&&x<pr*2){
+            cout << -1 << "\n";
+            return;
+        }
+    }
+    cout << pr << "\n";
 }
 
 int main(){
     cin.tie(nullptr)->sync_with_stdio(false);
+    for(int i=2;i<N;i++){
+        if(lp[i])continue;
+        for(int j=i;j<N;j+=i){
+            if(!lp[j]){
+                lp[j]=i;
+            }
+        }
+    }
     int t(1);
     cin >> t;
     while(t--)runcase();

@@ -30,38 +30,37 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 mt19937_64 rng64(chrono::steady_clock::now().time_since_epoch().count());
 
 void runcase(){
-    int n;
-    cin >> n;
-    vector<int> a(n),p(n);
-    for(auto &x:a){
-        cin >> x;
-    }
-    for(auto &x:p){
-        cin >> x;
-        x--;
-    }
-    ll ans=0,ans2=0;
-    multiset<ll> cur,cand;
-    for(auto x:a){
-        cand.emplace(x);
-    }
-    for(int k=0;k*2+1<=n;k++){
-        while(cur.size()<k+1){
-            cur.emplace(*cand.rbegin());
-            cand.erase(prev(cand.end()));
-        }
-        ll res=1LL*(k+1)*(*cur.begin());
-        if(res>ans){
-            ans=res;
-            ans2=k+1;
-        }
-        if(cur.count(a[p[k]])){
-            cur.erase(cur.find(a[p[k]]));
-        }else{
-            cand.erase(cand.find(a[p[k]]));
+    ll x,m;
+    cin >> x >> m;
+    ll ans=(x<=m);
+    for(ll y=1;y<=min(x,m);y++){
+        ll z=x^y;
+        if(z%x!=0&&z%y==0){
+            ans++;
         }
     }
-    cout << ans << " " << ans2 << "\n";
+    auto work=[&](ll l,ll r){
+        if(r>0)ans+=(r-1)/x;
+        if(l>0)ans-=(l-1)/x;
+    };
+    ll p=x;
+    ll l=1,r=m+1;
+    for(int i=0;i<60;i++){
+        if(l==r)break;
+        ll b=1LL<<i;
+        if(l&b){
+            work(l^p,(l^p)+b);
+            l+=b;
+        }
+        if(r&b){
+            r-=b;
+            work(r^p,(r^p)+b);
+        }
+        if(p&b){
+            p^=b;
+        }
+    }
+    cout << ans << "\n";
 }
 
 int main(){

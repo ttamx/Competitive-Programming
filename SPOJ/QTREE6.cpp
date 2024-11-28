@@ -9,16 +9,17 @@ int a[N];
 vector<int> adj[N];
 
 struct StaticTopTree{
+    using P = pair<int,int>;
     enum Type{Compress,Rake,AddEdge,AddVertex,Vertex};
     int pa[N],hv[N];
     int lch[4*N],rch[4*N],par[4*N];
     Type type[N];
     int node_id,root;
-    int dfs(int u,int p){
-        pa[u]=p;
+    int dfs(int u){
         int s=1,mx=0;
-        for(auto v:adj[u])if(v!=p){
-            int t=dfs(v,u);
+        for(auto v:adj[u])if(v!=pa[u]){
+            pa[v]=u;
+            int t=dfs(v);
             s+=t;
             if(t>mx)mx=t,hv[u]=v;
         }
@@ -26,121 +27,166 @@ struct StaticTopTree{
     }
     int add(int i,int l,int r,Type t){
         if(!i)i=++node_id;
-        par[i]=0,lch[i]=l,rch[i]=r,type[i]=t;
+        lch[i]=l,rch[i]=r,type[i]=t;
         if(l)par[l]=i;
         if(r)par[r]=i;
         return i;
     }
-    pair<int,int> merge(const vector<pair<int,int>> &a,Type t){
-        if(a.size()==1)return a[0];
-        vector<pair<int,int>> b,c;
-        int tot=0;
-        for(auto &[i,s]:a)tot+=s;
-        for(auto &[i,s]:a){
-            (tot>s?b:c).emplace_back(i,s);
-            tot-=s*2;
+    
+    P compress(int i){
+        vector<P> a{add_vertex(i)};
+        auto work=[&](){
+            auto [sj,j]=a.back();
+            a.pop_back();
+            auto [si,i]=a.back();
+            a.back()={max(si,sj)+1,add(0,i,j,Compress)};
+        };
+        while(hv[i]!=0){
+            a.emplace_back(add_vertex(i=hv[i]));
+            while(true){
+                if(a.size()>=3&&(a.end()[-3].first==a.end()[-2].first||a.end()[-3].first<=a.back().first)){
+                    P tmp=a.back();
+                    a.pop_back();
+                    work();
+                    a.emplace_back(tmp);
+                }else if(a.size()>=2&&a.end()[-2].first<=a.back().first){
+                    work();
+                }else break;
+            }
         }
-        auto [i,si]=merge(b,t);
-        auto [j,sj]=merge(c,t);
-        return {add(0,i,j,t),si+sj};
+        while(a.size()>=2)work();
+        return a[0];
     }
-    pair<int,int> compress(int i){
-        vector<pair<int,int>> a{add_vertex(i)};
-        while(hv[i])a.emplace_back(add_vertex(i=hv[i]));
-        return merge(a,Type::Compress);
+    P rake(int i){
+        priority_queue<P,vector<P>,greater<P>> pq;
+        for(int j:adj[i])if(j!=pa[i]&&j!=hv[i])pq.emplace(add_edge(j));
+        while(pq.size()>=2){
+            auto [si,i]=pq.top();pq.pop();
+            auto [sj,j]=pq.top();pq.pop();
+            pq.emplace(max(si,sj)+1,add(0,i,j,Rake));
+        }
+        return pq.empty()?make_pair(0,0):pq.top();
     }
-    pair<int,int> rake(int i){
-        vector<pair<int,int>> a;
-        for(auto j:adj[i])if(j!=pa[i]&&j!=hv[i])a.emplace_back(add_edge(j));
-        return a.empty()?make_pair(0,0):merge(a,Type::Rake);
+    P add_edge(int i){
+        auto [sj,j]=compress(i);
+        return {sj+1,add(0,j,0,AddEdge)};
     }
-    pair<int,int> add_edge(int i){
-        auto [j,s]=compress(i);
-        return {add(0,j,0,Type::AddEdge),s};
-    }
-    pair<int,int> add_vertex(int i){
-        auto [j,s]=rake(i);
-        return {add(i,j,0,j?Type::AddVertex:Type::Vertex),s+1};
+    P add_vertex(int i){
+        auto [sj,j]=rake(i);
+        return {sj+1,add(i,j,0,j?AddVertex:Vertex)};
     }
     void build(){
         node_id=n;
-        dfs(1,0);
-        root=compress(1).first;
+        dfs(1);
+        root=compress(1).second;
     }
 }stt;
 
 struct TreeDP{
-    struct Point{
-        array<int,2> cnt;
-        Point():cnt(){}
-    }point[4*N];
     struct Path{
-        array<int,2> cnt,pcnt;
-        int psum;
-        Path():cnt(),pcnt(),psum(0){}
-    }path[4*N];
-    Path compress(Path p,Path c){
-        Path res=p;
-        for(int i=0;i<2;i++)if(p.pcnt[i]==p.psum)res.cnt[i]+=c.cnt[i];
-        for(int i=0;i<2;i++)res.pcnt[i]+=c.pcnt[i];
-        res.psum+=c.psum;
-        return res;
+        int c0,c1;
+        bool p0,p1;
+        static Path unit(){
+            return {0,0,1,1};
+        }
+    }path[4*N],rpath[4*N];
+    struct Point{
+        int c0,c1;
+        static Point unit(){
+            return {0,0};
+        }
+    }point[4*N];
+    Path compress(Path l,Path r){
+        return {l.c0+(l.p0?r.c0:0),l.c1+(l.p1?r.c1:0),l.p0&&r.p0,l.p1&&r.p1};
     }
     Point rake(Point l,Point r){
-        Point res;
-        for(int i=0;i<2;i++)res.cnt[i]=l.cnt[i]+r.cnt[i];
-        return res;
+        return {l.c0+r.c0,l.c1+r.c1};
     }
-    Point add_edge(Path d){
-        Point res;
-        for(int i=0;i<2;i++)res.cnt[i]=d.cnt[i];
-        return res;
+    Point add_edge(Path p){
+        return {p.c0,p.c1};
     }
-    Path add_vertex(Point d,int i){
-        Path res;
-        res.cnt[a[i]]=1+d.cnt[a[i]];
-        res.pcnt[a[i]]=res.psum=1;
-        return res;
+    Path add_vertex(Point p,int u){
+        return {a[u]==0?p.c0+1:0,a[u]==1?p.c1+1:0,a[u]^1,a[u]};
     }
-    Path vertex(int i){
-        Path res;
-        res.cnt[a[i]]=res.pcnt[a[i]]=res.psum=1;
-        return res;
-    }
-    void _update(int i){
-        if(stt.type[i]==stt.Type::Compress){
-            path[i]=compress(path[stt.lch[i]],path[stt.rch[i]]);
-        }else if(stt.type[i]==stt.Type::Rake){
-            point[i]=rake(point[stt.lch[i]],point[stt.rch[i]]);
-        }else if(stt.type[i]==stt.Type::AddEdge){
-            point[i]=add_edge(path[stt.lch[i]]);
-        }else if(stt.type[i]==stt.Type::AddVertex){
-            path[i]=add_vertex(point[stt.lch[i]],i);
-        }else{
-            path[i]=vertex(i);
-        }
-    }
-    void dfs(int i){
-        if(!i)return;
-        dfs(stt.lch[i]);
-        dfs(stt.rch[i]);
-        _update(i);
+    Path vertex(int u){
+        return {a[u]^1,a[u],a[u]^1,a[u]};
     }
     void build(){
         dfs(stt.root);
     }
-    void update(int i){
-        for(;i;i=stt.par[i])_update(i);
-    }
-    Path get_subtree(int i){
-        Path res=path[i];
-        while(true){
-            int p=stt.par[i];
-            if(!p||stt.type[p]!=stt.Type::Compress)break;
-            if(stt.lch[p]==i)res=compress(res,path[stt.rch[p]]);
-            i=p;
+    void _update(int u){
+        if(stt.type[u]==stt.Compress){
+            path[u]=compress(path[stt.lch[u]],path[stt.rch[u]]);
+            rpath[u]=compress(rpath[stt.rch[u]],rpath[stt.lch[u]]);
+        }else if(stt.type[u]==stt.Rake){
+            point[u]=rake(point[stt.lch[u]],point[stt.rch[u]]);
+        }else if(stt.type[u]==stt.AddEdge){
+            point[u]=add_edge(path[stt.lch[u]]);
+        }else if(stt.type[u]==stt.AddVertex){
+            path[u]=rpath[u]=add_vertex(point[stt.lch[u]],u);
+        }else{
+            path[u]=rpath[u]=vertex(u);
         }
-        return res;
+    }
+    void dfs(int u){
+        if(!u)return;
+        dfs(stt.lch[u]);
+        dfs(stt.rch[u]);
+        _update(u);
+    }
+    void update(int u){
+        while(u){
+            _update(u);
+            u=stt.par[u];
+        }
+    }
+    Path query_all(){
+        return path[stt.root];
+    }
+    Path query_reroot(int r){
+        int u=r;
+        Point res;
+        vector<tuple<Path,Path,Point,int>> a;
+        while(true){
+            int p=stt.par[u];
+            Path below=Path::unit(),above=Path::unit();
+            while(p&&stt.type[p]==stt.Compress){
+                int l=stt.lch[p],r=stt.rch[p];
+                if(l==u){
+                    below=compress(below,path[r]);
+                }else{
+                    above=compress(above,rpath[l]);
+                }
+                u=p;
+                p=stt.par[u];
+            }
+            if(p){
+                u=p;
+                p=stt.par[u];
+                Point sum=Point::unit();
+                while(stt.type[p]==stt.Rake){
+                    int l=stt.lch[p],r=stt.rch[p];
+                    sum=rake(sum,u==r?point[l]:point[r]);
+                    u=p;
+                    p=stt.par[u];
+                }
+                u=p;
+                a.emplace_back(below,above,sum,u);
+            }else{
+                res=rake(add_edge(below),add_edge(above));
+                break;
+            }
+        }
+        reverse(a.begin(),a.end());
+        for(auto &[below,above,sum,u]:a){
+            sum=rake(sum,res);
+            above=compress(above,add_vertex(sum,u));
+            res=rake(add_edge(below),add_edge(above));
+        }
+        if(stt.type[r]==stt.AddVertex){
+            res=rake(res,point[stt.lch[r]]);
+        }
+        return add_vertex(res,r);
     }
 }dp;
 
@@ -163,7 +209,8 @@ int main(){
             a[u]^=1;
             dp.update(u);
         }else{
-            cout << dp.get_subtree(u).cnt[a[u]] << "\n";
+            auto res=dp.query_reroot(u);
+            cout << (a[u]?res.c1:res.c0) << "\n";
         }
     }
 }

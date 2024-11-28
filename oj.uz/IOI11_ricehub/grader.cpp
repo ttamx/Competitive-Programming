@@ -1,4 +1,4 @@
-#include "ricehub2.cpp"
+#include "ricehub.h"
 #include <stdio.h>
 #include <stdlib.h>
 

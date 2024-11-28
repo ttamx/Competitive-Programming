@@ -30,38 +30,37 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 mt19937_64 rng64(chrono::steady_clock::now().time_since_epoch().count());
 
 void runcase(){
-    int n;
-    cin >> n;
-    vector<int> a(n),p(n);
-    for(auto &x:a){
-        cin >> x;
+    int n,m,k;
+    cin >> n >> m >> k;
+    vector<pair<int,int>> a(n),b(m);
+    for(auto &[x,y]:a){
+        cin >> x >> y;
     }
-    for(auto &x:p){
-        cin >> x;
-        x--;
+    for(auto &[x,y]:b){
+        cin >> x >> y;
     }
-    ll ans=0,ans2=0;
-    multiset<ll> cur,cand;
-    for(auto x:a){
-        cand.emplace(x);
-    }
-    for(int k=0;k*2+1<=n;k++){
-        while(cur.size()<k+1){
-            cur.emplace(*cand.rbegin());
-            cand.erase(prev(cand.end()));
+    ll p=1,idx=0;
+    int ans=0;
+    priority_queue<int> pq;
+    for(auto [l,r]:a){
+        while(idx<m&&b[idx].first<l){
+            pq.emplace(b[idx].second);
+            idx++;
         }
-        ll res=1LL*(k+1)*(*cur.begin());
-        if(res>ans){
-            ans=res;
-            ans2=k+1;
+        while(idx<m&&b[idx].first<=r){
+            idx++;
         }
-        if(cur.count(a[p[k]])){
-            cur.erase(cur.find(a[p[k]]));
-        }else{
-            cand.erase(cand.find(a[p[k]]));
+        while(!pq.empty()&&l-1+p<=r){
+            p+=pq.top();
+            pq.pop();
+            ans++;
+        }
+        if(l-1+p<=r){
+            cout << -1 << "\n";
+            return;
         }
     }
-    cout << ans << " " << ans2 << "\n";
+    cout << ans << "\n";
 }
 
 int main(){

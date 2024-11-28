@@ -32,41 +32,31 @@ mt19937_64 rng64(chrono::steady_clock::now().time_since_epoch().count());
 void runcase(){
     int n;
     cin >> n;
-    vector<int> a(n),p(n);
-    for(auto &x:a){
-        cin >> x;
+    vector<ll> a(n),b(n),c(n);
+    for(int i=0;i<n;i++){
+        cin >> a[i] >> b[i] >> c[i];
     }
-    for(auto &x:p){
-        cin >> x;
-        x--;
-    }
-    ll ans=0,ans2=0;
-    multiset<ll> cur,cand;
-    for(auto x:a){
-        cand.emplace(x);
-    }
-    for(int k=0;k*2+1<=n;k++){
-        while(cur.size()<k+1){
-            cur.emplace(*cand.rbegin());
-            cand.erase(prev(cand.end()));
+    vector<int> ord(n);
+    iota(ord.begin(),ord.end(),0);
+    sort(ord.begin(),ord.end(),[&](int i,int j){
+        return b[i]>b[j];
+    });
+    vector<ll> dp(n+1);
+    for(auto i:ord){
+        auto ndp=dp;
+        for(int j=0;j<=n;j++){
+            ndp[j]=max(ndp[j],dp[j]+a[i]-b[i]*c[i]);
         }
-        ll res=1LL*(k+1)*(*cur.begin());
-        if(res>ans){
-            ans=res;
-            ans2=k+1;
+        for(int j=1;j<=n;j++){
+            ndp[j]=max(ndp[j],dp[j-1]+a[i]-b[i]*(j-1));
         }
-        if(cur.count(a[p[k]])){
-            cur.erase(cur.find(a[p[k]]));
-        }else{
-            cand.erase(cand.find(a[p[k]]));
-        }
+        dp=move(ndp);
     }
-    cout << ans << " " << ans2 << "\n";
+    cout << *max_element(dp.begin(),dp.end()) << "\n";
 }
 
 int main(){
     cin.tie(nullptr)->sync_with_stdio(false);
     int t(1);
-    cin >> t;
     while(t--)runcase();
 }

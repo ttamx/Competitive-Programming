@@ -32,36 +32,46 @@ mt19937_64 rng64(chrono::steady_clock::now().time_since_epoch().count());
 void runcase(){
     int n;
     cin >> n;
-    vector<int> a(n),p(n);
-    for(auto &x:a){
-        cin >> x;
-    }
-    for(auto &x:p){
-        cin >> x;
-        x--;
-    }
-    ll ans=0,ans2=0;
-    multiset<ll> cur,cand;
-    for(auto x:a){
-        cand.emplace(x);
-    }
-    for(int k=0;k*2+1<=n;k++){
-        while(cur.size()<k+1){
-            cur.emplace(*cand.rbegin());
-            cand.erase(prev(cand.end()));
-        }
-        ll res=1LL*(k+1)*(*cur.begin());
-        if(res>ans){
-            ans=res;
-            ans2=k+1;
-        }
-        if(cur.count(a[p[k]])){
-            cur.erase(cur.find(a[p[k]]));
-        }else{
-            cand.erase(cand.find(a[p[k]]));
+    vector<vector<int>> a(3,vector<int>(n));
+    for(auto &v:a){
+        for(auto &x:v){
+            cin >> x;
+            x--;
         }
     }
-    cout << ans << " " << ans2 << "\n";
+    vector<set<pair<int,int>>> s(3);
+    for(int i=0;i<3;i++){
+        s[i].emplace(a[i][0],0);
+    }
+    vector<int> p(n,-1),who(n,-1);
+    for(int i=1;i<n;i++){
+        for(int j=0;j<3;j++){
+            auto it=s[j].upper_bound(make_pair(a[j][i],i));
+            if(it!=s[j].end()){
+                p[i]=it->second;
+                who[i]=j;
+            }
+        }
+        if(p[i]!=-1){
+            for(int j=0;j<3;j++){
+                s[j].emplace(a[j][i],i);
+            }
+        }
+    }
+    if(p[n-1]==-1){
+        cout << "NO\n";
+    }else{
+        cout << "YES\n";
+        vector<pair<int,int>> ans;
+        for(int i=n-1;i>0;i=p[i]){
+            ans.emplace_back(i,who[i]);
+        }
+        reverse(ans.begin(),ans.end());
+        cout << ans.size() << "\n";
+        for(auto [x,y]:ans){
+            cout << "qkj"[y] << " " << x+1 << "\n";
+        }
+    }
 }
 
 int main(){

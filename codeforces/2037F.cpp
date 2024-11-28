@@ -30,38 +30,55 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 mt19937_64 rng64(chrono::steady_clock::now().time_since_epoch().count());
 
 void runcase(){
-    int n;
-    cin >> n;
-    vector<int> a(n),p(n);
+    int n,k;
+    ll d;
+    cin >> n >> d >> k;
+    vector<ll> a(n),b(n);
     for(auto &x:a){
         cin >> x;
     }
-    for(auto &x:p){
+    for(auto &x:b){
         cin >> x;
-        x--;
     }
-    ll ans=0,ans2=0;
-    multiset<ll> cur,cand;
-    for(auto x:a){
-        cand.emplace(x);
-    }
-    for(int k=0;k*2+1<=n;k++){
-        while(cur.size()<k+1){
-            cur.emplace(*cand.rbegin());
-            cand.erase(prev(cand.end()));
+    auto check=[&](ll t){
+        vector<pair<ll,int>> event;
+        for(int i=0;i<n;i++){
+            {
+                ll v=a[i]-t*b[i];
+                ll p=(d*t-v)/t;
+                if(b[i]<=p){
+                    event.emplace_back(b[i],+1);
+                    event.emplace_back(p+1,-1);
+                }
+            }
+            {
+                ll v=a[i]+t*b[i];
+                ll p=(v-d*t+t-1)/t;
+                if(p<b[i]){
+                    event.emplace_back(p,+1);
+                    event.emplace_back(b[i],-1);
+                }
+            }
         }
-        ll res=1LL*(k+1)*(*cur.begin());
-        if(res>ans){
-            ans=res;
-            ans2=k+1;
+        int res=0,cur=0;
+        sort(event.begin(),event.end());
+        for(auto [x,y]:event){
+            cur+=y;
+            res=max(res,cur);
         }
-        if(cur.count(a[p[k]])){
-            cur.erase(cur.find(a[p[k]]));
+        return res;
+    };
+    ll mx=*max_element(a.begin(),a.end());
+    ll l=1,r=mx+1;
+    while(l<r){
+        ll m=(l+r)/2;
+        if(check(m)>=k){
+            r=m;
         }else{
-            cand.erase(cand.find(a[p[k]]));
+            l=m+1;
         }
     }
-    cout << ans << " " << ans2 << "\n";
+    cout << (l<=mx?l:-1LL) << "\n";
 }
 
 int main(){

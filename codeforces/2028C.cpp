@@ -30,38 +30,45 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 mt19937_64 rng64(chrono::steady_clock::now().time_since_epoch().count());
 
 void runcase(){
-    int n;
-    cin >> n;
-    vector<int> a(n),p(n);
+    int n,m,v;
+    cin >> n >> m >> v;
+    vector<ll> a(n);
     for(auto &x:a){
         cin >> x;
     }
-    for(auto &x:p){
-        cin >> x;
-        x--;
-    }
-    ll ans=0,ans2=0;
-    multiset<ll> cur,cand;
-    for(auto x:a){
-        cand.emplace(x);
-    }
-    for(int k=0;k*2+1<=n;k++){
-        while(cur.size()<k+1){
-            cur.emplace(*cand.rbegin());
-            cand.erase(prev(cand.end()));
+    vector<int> dpl(n),dpr(n);
+    for(int t=0;t<2;t++){
+        ll sum=0;
+        for(int r=0,l=0;r<n;r++){
+            sum+=a[r];
+            while(sum-a[l]>=v){
+                sum-=a[l];
+                l++;
+            }
+            if(sum>=v){
+                dpl[r]=(l==0?0:dpl[l-1])+1;
+            }
         }
-        ll res=1LL*(k+1)*(*cur.begin());
-        if(res>ans){
-            ans=res;
-            ans2=k+1;
-        }
-        if(cur.count(a[p[k]])){
-            cur.erase(cur.find(a[p[k]]));
-        }else{
-            cand.erase(cand.find(a[p[k]]));
-        }
+        reverse(a.begin(),a.end());
+        swap(dpl,dpr);
     }
-    cout << ans << " " << ans2 << "\n";
+    reverse(dpr.begin(),dpr.end());
+    if(dpl.back()<m){
+        cout << -1 << "\n";
+        return;
+    }
+    ll ans=0;
+    for(int i=1;i<n;i++){
+        a[i]+=a[i-1];
+    }
+    for(int l=0,r=0;r<n;r++){
+        int cur=(r+1<n?dpr[r+1]:0);
+        while(cur+(l>0?dpl[l-1]:0)<m){
+            l++;
+        }
+        ans=max(ans,a[r]-(l>0?a[l-1]:0LL));
+    }
+    cout << ans << "\n";
 }
 
 int main(){
