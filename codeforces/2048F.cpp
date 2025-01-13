@@ -2,38 +2,6 @@
 #include "data-structure/segment-tree/segment-tree.hpp"
 #include "group/monoid/min-idx.hpp"
 
-ll safe_mul(ll a,ll b){
-    return min(__int128_t(a)*b,__int128_t(1e18+1));
-}
-
-struct DualSegTree{
-    int n;
-    vector<ll> lz;
-    DualSegTree(int _n){
-        n=_n;
-        lz.assign(4*n,1LL);
-    }
-    void update(int l,int r,int i,int x,int y,ll v){
-        if(y<l||r<x)return;
-        if(x<=l&&r<=y)return void(lz[i]=safe_mul(lz[i],v));
-        int m=(l+r)/2;
-        update(l,m,i*2,x,y,v);
-        update(m+1,r,i*2+1,x,y,v);
-    }
-    void update(int x,int y,ll v){
-        update(0,n-1,1,x,y,v);
-    }
-    ll query(int l,int r,int i,int x){
-        if(l==r)return lz[i];
-        int m=(l+r)/2;
-        if(x<=m)return safe_mul(query(l,m,i*2,x),lz[i]);
-        else return safe_mul(query(m+1,r,i*2+1,x),lz[i]);
-    }
-    ll query(int x){
-        return query(0,n-1,1,x);
-    }
-};
-
 struct DS{
     vector<pair<ll,int>> a;
     void init(ll v){

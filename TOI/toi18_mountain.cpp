@@ -5,37 +5,44 @@ using namespace std;
 typedef long long ll;
 
 const int N=505;
+const ll INF=LLONG_MAX/2;
 
-int n,m,ans;
-pair<ll,ll> p[N];
+int n,q;
+ll a[N],b[N];
 ll dp[N][N];
+ll ans;
 
-ll calc(int i,int j){
-    return abs(p[i].first-p[j].first)+abs(p[i].second-p[j].second);
+ll dist(int i,int j){
+    return abs(a[i]-a[j])+abs(b[i]-b[j]);
 }
 
 int main(){
     cin.tie(nullptr)->sync_with_stdio(false);
-    cin >> n >> m;
-    for(int i=0;i<=n;i++)for(int j=0;j<=n;j++)dp[i][j]=1e18;
-    for(int i=1;i<=n;i++)cin >> p[i].first >> p[i].second;
-    dp[0][1]=0;
+    cin >> n >> q;
     for(int i=1;i<=n;i++){
-        for(int j=1;j<=n;j++){
-            dp[i][j]=dp[i-1][j];
-            for(int k=1;k<=n;k++){
-                dp[i][j]=min(dp[i][j],max(dp[i-1][k],calc(j,k)));
+        cin >> a[i] >> b[i];
+    }
+    for(int i=0;i<=n;i++){
+        for(int j=0;j<=n;j++){
+            dp[i][j]=INF;
+        }
+    }
+    dp[1][0]=0;
+    for(int i=1;i<=n;i++){
+        for(int u=1;u<=n;u++){
+            for(int v=1;v<=n;v++){
+                dp[u][i]=min(dp[u][i],max(dp[v][i-1],dist(u,v)));
             }
         }
     }
-    for(int i=0;i<m;i++){
-        ll x;
-        cin >> x;
+    while(q--){
+        ll s;
+        cin >> s;
         int l=1,r=n;
         while(l<r){
-            int mid=(l+r)/2;
-            if(x>=dp[mid][n])r=mid;
-            else l=mid+1;
+            int m=(l+r)/2;
+            if(dp[n][m]<=s)r=m;
+            else l=m+1;
         }
         ans+=l;
     }
