@@ -116,7 +116,10 @@
         "stdfloat": "cpp",
         "filesystem": "cpp",
         "dorm": "cpp",
-        "__verbose_abort": "cpp"
+        "__verbose_abort": "cpp",
+        "generator": "cpp",
+        "print": "cpp",
+        "text_encoding": "cpp"
     },
     "cph.general.onceMaintainerMessage": false
 }
