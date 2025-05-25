@@ -1,54 +1,68 @@
 #include<bits/stdc++.h>
+#include<ext/pb_ds/assoc_container.hpp>
+#include<ext/pb_ds/tree_policy.hpp>
 
 using namespace std;
+using namespace __gnu_pbds;
+
+using ll = long long;
+using db = long double;
+using vi = vector<int>;
+using vl = vector<ll>;
+using vd = vector<db>;
+using pii = pair<int,int>;
+using pll = pair<ll,ll>;
+using pdd = pair<db,db>;
+const int INF=0x3fffffff;
+// const int MOD=1000000007;
+const int MOD=998244353;
+const ll LINF=0x1fffffffffffffff;
+const db DINF=numeric_limits<db>::infinity();
+const db EPS=1e-9;
+const db PI=acos(db(-1));
+
+template<class T>
+using ordered_set = tree<T,null_type,less<T>,rb_tree_tag,tree_order_statistics_node_update>;
+template<class T>
+using ordered_multiset = tree<T,null_type,less_equal<T>,rb_tree_tag,tree_order_statistics_node_update>;
+
+mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
+mt19937_64 rng64(chrono::steady_clock::now().time_since_epoch().count());
 
 void runcase(){
     int n,k;
     cin >> n >> k;
     string a,b;
     cin >> a >> b;
-    set<int> s;
-    map<char,int> mp;
-    vector<vector<int>> v(11);
-    int idx=0;
-    for(int i=0;i<n;i++){
-        if(a[i]==b[i]){
-            s.insert(i);
-        }else{
-            if(mp.find(a[i])==mp.end())mp[a[i]]=idx++;
-            v[mp[a[i]]].push_back(i);
+    vector<int> id(256,-1);
+    int cur=0;
+    for(auto x:a){
+        if(id[x]==-1){
+            id[x]=cur++;
         }
     }
-    k=min(k,idx);
-    if(k==idx){
-        cout << 1ll*n*(n+1)/2 << '\n';
-        return;
-    }
-    auto calc=[&](set<int> s){
-        long long res=0,tmp=0;
-        int prev=-2e9;
-        for(auto x:s){
-            if(x==prev+1){
-                tmp++;
-            }else{
-                res+=tmp*(tmp+1)/2;
-                tmp=1;
-            }
-            prev=x;
+    k=min(k,cur);
+    ll ans=0;
+    for(int mask=0;mask<(1<<cur);mask++){
+        if(__builtin_popcount(mask)!=k){
+            continue;
         }
-        res+=tmp*(tmp+1)/2;
-        return res;
-    };
-    function<long long(set<int>,int,int)> sol=[&](set<int> s,int i,int cnt){
-        if(idx-i+cnt<k)return 0ll;
-        long long res=calc(s);
-        if(cnt>=k||i>=idx)return res;
-        res=max(res,sol(s,i+1,cnt));
-        for(auto x:v[i])s.insert(x);
-        res=max(res,sol(s,i+1,cnt+1));
-        return res;
-    };
-    cout << sol(s,0,0) << '\n';
+        vector<int> c(n);
+        for(int i=0;i<n;i++){
+            c[i]=(a[i]==b[i]||(mask>>id[a[i]]&1));
+        }
+        ll res=0;
+        for(int i=0;i<n;i++){
+            if(!c[i])continue;
+            int j=i;
+            while(j<n&&c[j])j++;
+            int s=j-i;
+            res+=1LL*s*(s+1)/2;
+            i=j-1;
+        }
+        ans=max(ans,res);
+    }
+    cout << ans << "\n";
 }
 
 int main(){

@@ -1,8 +1,6 @@
 #include "template.hpp"
 #include "data-structure/fenwick-tree.hpp"
 
-mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
-
 void runcase(){
     int n,q;
     cin >> n >> q;
@@ -38,7 +36,6 @@ void runcase(){
     };
     for(int i=0;i<n;i++)update(i,1);
     for(auto &[t,l,r,x]:qr){
-        cin >> t;
         if(t==1){
             update(l,-1);
             a[l]=x;

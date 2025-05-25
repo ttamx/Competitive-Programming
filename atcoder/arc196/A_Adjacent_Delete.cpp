@@ -1,0 +1,94 @@
+#include<bits/stdc++.h>
+#include<ext/pb_ds/assoc_container.hpp>
+#include<ext/pb_ds/tree_policy.hpp>
+
+using namespace std;
+using namespace __gnu_pbds;
+
+using ll = long long;
+using db = long double;
+using vi = vector<int>;
+using vl = vector<ll>;
+using vd = vector<db>;
+using pii = pair<int,int>;
+using pll = pair<ll,ll>;
+using pdd = pair<db,db>;
+const int INF=0x3fffffff;
+// const int MOD=1000000007;
+const int MOD=998244353;
+const ll LINF=0x1fffffffffffffff;
+const db DINF=numeric_limits<db>::infinity();
+const db EPS=1e-9;
+const db PI=acos(db(-1));
+
+template<class T>
+using ordered_set = tree<T,null_type,less<T>,rb_tree_tag,tree_order_statistics_node_update>;
+template<class T>
+using ordered_multiset = tree<T,null_type,less_equal<T>,rb_tree_tag,tree_order_statistics_node_update>;
+
+mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
+mt19937_64 rng64(chrono::steady_clock::now().time_since_epoch().count());
+
+void runcase(){
+    int n;
+    cin >> n;
+    vector<int> a(n);
+    for(auto &x:a)cin >> x;
+    if(n%2==0){
+        ll ans=0;
+        sort(a.begin(),a.end());
+        for(int l=0,r=n-1;l<r;l++,r--)ans+=a[r]-a[l];
+        cout << ans << "\n";
+        return;
+    }
+    vector<ll> pre(n,-LINF),suf(n,-LINF);
+    {
+        priority_queue<int> pql;
+        priority_queue<int,vector<int>,greater<int>> pqr;
+        ll suml=0,sumr=0;
+        for(int i=0;i<n;i++){
+            if(pql.size()==pqr.size())pre[i]=sumr-suml;
+            if(pql.empty()||a[i]<pql.top())pql.emplace(a[i]),suml+=a[i];
+            else pqr.emplace(a[i]),sumr+=a[i];
+            if(pql.size()>pqr.size()){
+                ll v=pql.top();pql.pop();
+                pqr.emplace(v);
+                suml-=v;sumr+=v;
+            }
+            if(pql.size()<pqr.size()){
+                ll v=pqr.top();pqr.pop();
+                pql.emplace(v);
+                sumr-=v;suml+=v;
+            }
+        }
+    }
+    {
+        priority_queue<int> pql;
+        priority_queue<int,vector<int>,greater<int>> pqr;
+        ll suml=0,sumr=0;
+        for(int i=n-1;i>=0;i--){
+            if(pql.size()==pqr.size())suf[i]=sumr-suml;
+            if(pql.empty()||a[i]<pql.top())pql.emplace(a[i]),suml+=a[i];
+            else pqr.emplace(a[i]),sumr+=a[i];
+            if(pql.size()>pqr.size()){
+                ll v=pql.top();pql.pop();
+                pqr.emplace(v);
+                suml-=v;sumr+=v;
+            }
+            if(pql.size()<pqr.size()){
+                ll v=pqr.top();pqr.pop();
+                pql.emplace(v);
+                sumr-=v;suml+=v;
+            }
+        }
+    }
+    ll ans=0;
+    for(int i=0;i<n;i+=2)ans=max(ans,pre[i]+suf[i]);
+    cout << ans << "\n";
+}
+
+int main(){
+    cin.tie(nullptr)->sync_with_stdio(false);
+    int t(1);
+    while(t--)runcase();
+}

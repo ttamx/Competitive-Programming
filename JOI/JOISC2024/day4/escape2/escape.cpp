@@ -83,7 +83,7 @@ int main(){
     for(int i=2;i<=n;i++)lg[i]=lg[i/2]+1;
     for(int l=1;l<=n;l++){
         sort(qr[l].begin(),qr[l].end());
-        unordered_map<int,ll> pt;
+        map<int,ll> pt;
         ll res=INF;
         for(int j=0;j<m[l];j++){
             pt[dp[0][l][j].first]=dp[0][l][j].second;
@@ -93,7 +93,7 @@ int main(){
         for(auto [r,i]:qr[l]){
             if(r>pre){
                 res=INF;
-                unordered_map<int,ll> npt;
+                map<int,ll> npt;
                 for(auto [_p,_w]:pt){
                     int x=pre,p=_p;
                     ll w=_w;
