@@ -9,6 +9,7 @@ teaching/
 *.exe
 *.bin
 *.o
+*.out
 .DS_Store
 .vscode/
 *.expanded.*
