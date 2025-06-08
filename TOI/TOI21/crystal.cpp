@@ -4,7 +4,7 @@ using namespace std;
 
 struct PrefixMax{
     map<int,int> dat;
-    void insert(int i,int v){
+    void update(int i,int v){
         i=-i;
         auto it=dat.lower_bound(i);
         if(it!=dat.end()&&v<=it->second)return;
@@ -30,11 +30,18 @@ int main(){
     }
     PrefixMax all;
     vector<PrefixMax> ds(m);
+    int ans=0;
     for(auto &[_,v]:mp){
-        vector<pair<int,int>> upd;
+        vector<tuple<int,int,int>> upd;
         for(auto [p,w]:v){
             int cur=max(all.query(p-1)-k,ds[w].query(p-1))+1;
-            upd.emplace_back(p,cur);
+            upd.emplace_back(p,w,cur);
+            ans=max(ans,cur);
+        }
+        for(auto [p,w,val]:upd){
+            ds[w].update(p,val);
+            all.update(p,val);
         }
     }
+    cout << ans << "\n";
 }
