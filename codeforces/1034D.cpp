@@ -10,74 +10,110 @@ const int L=1e9;
 
 int n,k;
 int l[N],r[N];
-
-struct Info{
-    int val,cnt;
-    Info():val(0),cnt(0){}
-    Info(int v,int c):val(v),cnt(c){}
-    friend Info operator+(const Info &l,const Info &r){
-        if(l.val<r.val)return l;
-        if(r.val<l.val)return r;
-        return Info{l.val,l.cnt+r.cnt};
-    }
-};
+ll a[N];
+vector<tuple<int,int,int>> event[N];
 
 struct Segtree{
-    struct Node;
-    using Ptr = Node*;
-    struct Node{
-        Info val;
-        int lz;
-        Ptr l,r;
-        Node():val(),lz(0),l(),r(){}
-        Node(int s):val(0,s),lz(0),l(),r(){}
-    };
-    Ptr root=new Node(L);
-    void apply(int l,int r,Ptr &t,int v){
-        if(!t)t=new Node(r-k+1);
-        t->val.val+=v;
-        t->lz+=v;
+    ll t[K],lz[K];
+    void apply(int l,int r,int i,ll v){
+        t[i]+=v*(r-l+1);
+        lz[i]+=v;
     }
-    void push(int l,int m,int r,Ptr t){
-        apply(l,m,t->l,t->lz);
-        apply(m+1,r,t->r,t->lz);
-        t->lz=0;
+    void push(int l,int m,int r,int i){
+        apply(l,m,i*2,lz[i]);
+        apply(m+1,r,i*2+1,lz[i]);
+        lz[i]=0;
     }
-    void update(int l,int r,Ptr t,int x,int y,int v){
+    void update(int l,int r,int i,int x,int y,ll v){
         if(y<l||r<x)return;
-        if(x<=l&&r<=y)return apply(l,r,t,v);
+        if(x<=l&&r<=y)return apply(l,r,i,v);
         int m=(l+r)/2;
-        push(l,m,r,t);
-        update(l,m,t->l,x,y,v);
-        update(m+1,r,t->r,x,y,v);
-        t->val=t->l->val+t->r->val;
+        push(l,m,r,i);
+        update(l,m,i*2,x,y,v);
+        update(m+1,r,i*2+1,x,y,v);
+        t[i]=t[i*2]+t[i*2+1];
     }
-    void update(int x,int y,int v){update(1,L,root,x,y,v);}
-    void clear(Ptr t){
-        if(!t)return;
-        t->val.val=0;
-        t->lz=0;
-        clear(t->l);
-        clear(t->r);
+    void update(int x,int y,ll v){
+        update(1,n,1,x,y,v);
     }
-    void clear(){clear(root);}
-    int query(){
-        if(root->val.cnt>0)return L;
-        return L-root->val.cnt;
+    ll query(int l,int r,int i,int x,int y){
+        if(y<l||r<x)return 0LL;
+        if(x<=l&&r<=y)return t[i];
+        int m=(l+r)/2;
+        push(l,m,r,i);
+        return query(l,m,i*2,x,y)+query(m+1,r,i*2+1,x,y);
+    }
+    ll query(int x,int y){
+        return query(1,n,1,x,y);
     }
 }seg;
 
-pair<ll,ll> solve(ll mid){
-    pair<ll,ll> res;
-    for(int i=1,j=1;i<=n;i++){
-        for(;j<=n&&seg.query()<mid;j++)seg.update(l[j],r[j],+1);
-        if(seg.query()<mid)break;
-        ans+=seg.query();
+struct Chtholly{
+    map<int,pair<int,int>> dat;
+    Chtholly(){dat[1e9]={-1e9,0};}
+    template<class F>
+    void enumerate(int l,int r,int v,const F &f){
+        auto it=dat.upper_bound(l);
+        {
+            auto &[p,v]=it->second;
+            if(p<l){
+                dat[l]={p,v};
+                p=l;
+            }
+        }
+        for(;it!=dat.end()&&it->first<=r;it=dat.erase(it)){
+            f(it->second.first,it->first,it->second.second);
+        }
+        if(it!=dat.end()){
+            auto &[p,v]=it->second;
+            if(p<r){
+                f(p,r,v);
+                p=r;
+            }
+        }
+        dat[r]={l,v};
     }
+}ds;
+
+void prepare(){
+    for(int i=1;i<=n;i++){
+        ds.enumerate(l[i],r[i],i,[&](int l,int r,int j){
+            if(j)event[i].emplace_back(1,j,-(r-l));
+        });
+        event[i].emplace_back(1,i,r[i]-l[i]);
+    }
+}
+
+pair<ll,ll> solve(ll mid,bool f){
+    ll sum=0,cnt=0;
+    ll sz=0;
+    for(int i=1;i<=n;i++)a[i]=0;
+    for(int i=1,p=1;i<=n;i++){
+        for(auto [l,r,v]:event[i]){
+            if(r>=p)sz+=v;
+            a[r]+=v;
+            if(f)seg.update(l,r,v);
+        }
+        while(sz>=mid)sz-=a[p++];
+        if(p>1){
+            if(f)sum+=seg.query(1,p-1);
+            cnt+=p-1;
+        }
+    }
+    return {sum,cnt};
 }
 
 int main(){
     cin.tie(nullptr)->sync_with_stdio(false);
     cin >> n >> k;
-
+    for(int i=1;i<=n;i++)cin >> l[i] >> r[i];
+    prepare();
+    ll l=1,r=L;
+    while(l<r){
+        ll m=(l+r+1)/2;
+        if(solve(m,false).second>=k)l=m;
+        else r=m-1;
+    }
+    auto [sum,cnt]=solve(l,true);
+    cout << sum-(cnt-k)*l << "\n";
 }
