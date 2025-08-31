@@ -1,0 +1,99 @@
+#include<bits/stdc++.h>
+#include<ext/pb_ds/assoc_container.hpp>
+#include<ext/pb_ds/tree_policy.hpp>
+
+using namespace std;
+using namespace __gnu_pbds;
+
+using ll = long long;
+using db = long double;
+using vi = vector<int>;
+using vl = vector<ll>;
+using vd = vector<db>;
+using pii = pair<int,int>;
+using pll = pair<ll,ll>;
+using pdd = pair<db,db>;
+const int INF=0x3fffffff;
+// const int MOD=1000000007;
+const int MOD=998244353;
+const ll LINF=0x1fffffffffffffff;
+const db DINF=numeric_limits<db>::infinity();
+const db EPS=1e-9;
+const db PI=acos(db(-1));
+
+template<class T>
+using ordered_set = tree<T,null_type,less<T>,rb_tree_tag,tree_order_statistics_node_update>;
+template<class T>
+using ordered_multiset = tree<T,null_type,less_equal<T>,rb_tree_tag,tree_order_statistics_node_update>;
+
+mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
+mt19937_64 rng64(chrono::steady_clock::now().time_since_epoch().count());
+
+struct Info{
+    ll mn,sum;
+    Info():mn(0LL),sum(0LL){}
+    Info(ll a,ll b):mn(-a),sum(b-a){}
+    friend Info operator+(const Info &l,const Info &r){
+        Info res;
+        res.mn=min(l.mn,l.sum+r.mn);
+        res.sum=l.sum+r.sum;
+        return res;
+    }
+};
+
+void runcase(){
+    int n;
+    cin >> n;
+    vector<int> a(n),b(n);
+    vector<int> good,bad;
+    ll total=0,base=0;
+    for(int i=0;i<n;i++){
+        cin >> a[i] >> b[i];
+        if(a[i]<=b[i]){
+            good.emplace_back(i);
+        }else{
+            bad.emplace_back(i);
+        }
+        total+=b[i]-a[i];
+        base+=a[i];
+    }
+    sort(good.begin(),good.end(),[&](int i,int j){return a[i]<a[j];});
+    sort(bad.begin(),bad.end(),[&](int i,int j){return b[i]>b[j];});
+    auto seq=good;
+    seq.insert(seq.end(),bad.begin(),bad.end());
+    vector<int> pos(n);
+    for(int i=0;i<n;i++){
+        pos[seq[i]]=i;
+    }
+    vector<Info> c(n);
+    for(int i=0;i<n;i++){
+        c[pos[i]]=Info(a[i],b[i]);
+    }
+    auto pre=c,suf=c;
+    for(int i=1;i<n;i++){
+        pre[i]=pre[i-1]+pre[i];
+    }
+    for(int i=n-2;i>=0;i--){
+        suf[i]=suf[i]+suf[i+1];
+    }
+    ll ans=LINF;
+    for(int i=0;i<n;i++){
+        int p=pos[i];
+        Info res;
+        if(p>0)res=pre[p-1];
+        if(p+1<n)res=res+suf[p+1];
+        ll exc=-res.mn;
+        ll cur=total+a[i]-b[i]+exc;
+        if(cur>=a[i]+exc){
+            ans=min(ans,base+exc);
+        }
+    }
+    cout << (ans<LINF?ans:-1LL) << "\n";
+}
+
+int main(){
+    cin.tie(nullptr)->sync_with_stdio(false);
+    int t(1);
+    cin >> t;
+    while(t--)runcase();
+}

@@ -30,18 +30,46 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 mt19937_64 rng64(chrono::steady_clock::now().time_since_epoch().count());
 
 void runcase(){
-    int x;
-    cin >> x;
-    for(int i=1;i<x;i*=2){
-        if(x&i)continue;
-        for(int j=1;j<x;j*=2){
-            if((x&j)&&(i|j)<x){
-                cout << (i|j) << "\n";
-                return;
+    int n;
+    cin >> n;
+    vector<vector<int>> adj(n);
+    vector<int> deg(n);
+    for(int i=0;i<n-1;i++){
+        int u,v;
+        cin >> u >> v;
+        u--,v--;
+        adj[u].emplace_back(v);
+        adj[v].emplace_back(u);
+        deg[u]++,deg[v]++;
+    }
+    if(n==2){
+        cout << 0 << "\n";
+        return;
+    }
+    int tot=count(deg.begin(),deg.end(),1);
+    int ans=INF;
+    vector<int> sz(n);
+    function<void(int,int)> dfs=[&](int u,int p){
+        sz[u]=(deg[u]==1);
+        int sum=0;
+        for(auto v:adj[u]){
+            if(v==p)continue;
+            dfs(v,u);
+            sz[u]+=sz[v];
+            if(deg[v]>1){
+                sum+=sz[v];
             }
         }
+        sum+=tot-sz[u];
+        ans=min(ans,sum);
+    };
+    for(int i=0;i<n;i++){
+        if(deg[i]>1){
+            dfs(i,-1);
+            break;
+        }
     }
-    cout << -1 << "\n";
+    cout << ans << "\n";
 }
 
 int main(){

@@ -29,19 +29,18 @@ using ordered_multiset = tree<T,null_type,less_equal<T>,rb_tree_tag,tree_order_s
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 mt19937_64 rng64(chrono::steady_clock::now().time_since_epoch().count());
 
+ll calc(ll x){
+    ll res=x/2+x/3+x/5+x/7;
+    res-=x/6+x/10+x/14+x/15+x/21+x/35;
+    res+=x/30+x/42+x/70+x/105;
+    res-=x/210;
+    return res;
+}
+
 void runcase(){
-    int x;
-    cin >> x;
-    for(int i=1;i<x;i*=2){
-        if(x&i)continue;
-        for(int j=1;j<x;j*=2){
-            if((x&j)&&(i|j)<x){
-                cout << (i|j) << "\n";
-                return;
-            }
-        }
-    }
-    cout << -1 << "\n";
+    ll l,r;
+    cin >> l >> r;
+    cout << r-l+1-calc(r)+calc(l-1) << "\n";
 }
 
 int main(){

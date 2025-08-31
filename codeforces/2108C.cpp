@@ -30,18 +30,49 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 mt19937_64 rng64(chrono::steady_clock::now().time_since_epoch().count());
 
 void runcase(){
-    int x;
-    cin >> x;
-    for(int i=1;i<x;i*=2){
-        if(x&i)continue;
-        for(int j=1;j<x;j*=2){
-            if((x&j)&&(i|j)<x){
-                cout << (i|j) << "\n";
-                return;
+    int n;
+    cin >> n;
+    map<int,vector<int>> mp;
+    for(int i=0;i<n;i++){
+        int x;
+        cin >> x;
+        mp[-x].emplace_back(i);
+    }
+    vector<bool> ok(n),ok2(n),mark(n);
+    function<void(int)> work=[&](int s){
+        mark[s]=true;
+        if(s>0){
+            ok[s-1]=true;
+            if(ok2[s-1]&&!mark[s-1]){
+                work(s-1);
+            }
+        }
+        if(s+1<n){
+            ok[s+1]=true;
+            if(ok2[s+1]&&!mark[s+1]){
+                work(s+1);
+            }
+        }
+    };
+    int ans=0;
+    for(auto &[_,v]:mp){
+        for(auto i:v){
+            ok2[i]=true;
+        }
+        for(auto i:v){
+            if(ok[i]&&!mark[i]){
+                work(i);
+            }
+        }
+        for(auto i:v){
+            if(!mark[i]){
+                ans++;
+                ok[i]=true;
+                work(i);
             }
         }
     }
-    cout << -1 << "\n";
+    cout << ans << "\n";
 }
 
 int main(){

@@ -30,18 +30,23 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 mt19937_64 rng64(chrono::steady_clock::now().time_since_epoch().count());
 
 void runcase(){
-    int x;
-    cin >> x;
-    for(int i=1;i<x;i*=2){
-        if(x&i)continue;
-        for(int j=1;j<x;j*=2){
-            if((x&j)&&(i|j)<x){
-                cout << (i|j) << "\n";
-                return;
-            }
-        }
+    int n;
+    cin >> n;
+    vector<int> a(n+2),b(n+2);
+    for(int i=1;i<=n;i++){
+        cin >> a[i];
     }
-    cout << -1 << "\n";
+    for(int i=1;i<=n;i++){
+        cin >> b[i];
+    }
+    bool flag=true;
+    for(int i=1;i<=n;i++){
+        flag&=a[i-1]%a[i]==0;;
+        flag&=b[i+1]%b[i]==0;;
+        flag&=a[i]%gcd(a[i-1],b[i])==0;
+        flag&=b[i]%gcd(b[i+1],a[i])==0;
+    }
+    cout << (flag?"YES":"NO") << "\n";
 }
 
 int main(){
