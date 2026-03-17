@@ -1,92 +1,96 @@
 #include<bits/stdc++.h>
+#include<ext/pb_ds/assoc_container.hpp>
+#include<ext/pb_ds/tree_policy.hpp>
 
 using namespace std;
+using namespace __gnu_pbds;
+
+using ll = long long;
+using db = long double;
+using vi = vector<int>;
+using vl = vector<ll>;
+using vd = vector<db>;
+using pii = pair<int,int>;
+using pll = pair<ll,ll>;
+using pdd = pair<db,db>;
+const int INF=0x3fffffff;
+// const int MOD=1000000007;
+const int MOD=998244353;
+const ll LINF=0x1fffffffffffffff;
+const db DINF=numeric_limits<db>::infinity();
+const db EPS=1e-9;
+const db PI=acos(db(-1));
+
+template<class T>
+using ordered_set = tree<T,null_type,less<T>,rb_tree_tag,tree_order_statistics_node_update>;
+template<class T>
+using ordered_multiset = tree<T,null_type,less_equal<T>,rb_tree_tag,tree_order_statistics_node_update>;
+
+mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
+mt19937_64 rng64(chrono::steady_clock::now().time_since_epoch().count());
 
 const int N=3e5+5;
-const int K=650;
 
-void runcase(){
-    vector<bool> notprime(K);
-    vector<int> prime;
-    for(int i=2;i<K;i++){
-        if(notprime[i])continue;
-        prime.push_back(i);
-        for(int j=i;j<K;j+=i)notprime[j]=true;
-    }
-    int n;
-    cin >> n;
-    vector<int> a(n+1);
-    vector<vector<pair<int,int>>> adj(N);
-    for(int i=1;i<=n;i++){
-        auto &x=a[i];
-        cin >> x;
-        int num=x;
-        vector<int> res;
-        for(auto p:prime){
-            if(num%p)continue;
-            res.push_back(p);
-            while(num%p==0)num/=p;
-        }
-        if(num>1)res.push_back(num);
-        for(auto u:res)for(auto v:res)if(u!=v)adj[u].push_back({v,i});
-    }
-    int s,t;
-    cin >> s >> t;
-    if(s==t){
-        cout << 1 << '\n';
-        cout << s << '\n';
-        return;
-    }
-    vector<pair<int,int>> pa(N);
-    vector<bool> des(N),vis(N);
-    queue<int> q;
-    int num=a[s];
-    for(auto p:prime){
-        if(num%p)continue;
-        q.push(p),pa[p]={0,s},vis[p]=true;
-        while(num%p==0)num/=p;
-    }
-    if(num>1)q.push(num),pa[num]={0,s},vis[num]=true;
-    num=a[t];
-    for(auto p:prime){
-        if(num%p)continue;
-        des[p]=true;
-        while(num%p==0)num/=p;
-    }
-    if(num>1)des[num]=true;
-    int cur=-1;
-    while(!q.empty()){
-        int u=q.front();
-        q.pop();
-        if(des[u]){
-            cur=u;
-            break;
-        }
-        for(auto [v,w]:adj[u]){
-            if(vis[v])continue;
-            q.push(v);
-            vis[v]=true;
-            pa[v]={u,w};
-        }
-    }
-    if(cur==-1){
-        cout << -1;
-        return;
-    }
-    vector<int> ans;
-    ans.push_back(t);
-    while(cur){
-        auto [u,w]=pa[cur];
-        ans.push_back(w);
-        cur=u;
-    }
-    reverse(ans.begin(),ans.end());
-    cout << ans.size() << '\n';
-    for(auto x:ans)cout << x << ' ';
-}
+int n;
+int lp[N];
+vector<pair<int,int>> adj[N*2];
+int dist[N*2];
+int par[N*2];
 
 int main(){
     cin.tie(nullptr)->sync_with_stdio(false);
-    int t(1);
-    while(t--)runcase();
+    for(int i=2;i<N;i++){
+        if(lp[i])continue;
+        lp[i]=i;
+        for(int j=i;j<N;j+=i){
+            if(!lp[j]){
+                lp[j]=i;
+            }
+        }
+    }
+    cin >> n;
+    for(int i=1;i<=n;i++){
+        int x;
+        cin >> x;
+        while(x>1){
+            int p=lp[x];
+            adj[i].emplace_back(n+p,1);
+            adj[n+p].emplace_back(i,0);
+            x/=p;
+        }
+    }
+    int s,t;
+    cin >> s >> t;
+    for(int i=0;i<N*2;i++){
+        dist[i]=INF;
+    }
+    deque<pair<int,int>> q;
+    q.emplace_front(1,t);
+    dist[t]=1;
+    while(!q.empty()){
+        auto [d,u]=q.front();
+        q.pop_front();
+        if(d>dist[u])continue;
+        for(auto [v,w]:adj[u]){
+            if(d+w<dist[v]){
+                dist[v]=d+w;
+                par[v]=u;
+                if(w){
+                    q.emplace_back(d+1,v);
+                }else{
+                    q.emplace_front(d,v);
+                }
+            }
+        }
+    }
+    if(dist[s]<INF){
+        cout << dist[s] << "\n";
+        for(;s;s=par[s]){
+            if(s<=n){
+                cout << s << " ";
+            }
+        }
+    }else{
+        cout << -1;
+    }
 }

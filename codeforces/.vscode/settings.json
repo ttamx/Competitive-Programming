@@ -106,6 +106,8 @@
         "__verbose_abort": "cpp",
         "print": "cpp",
         "generator": "cpp",
-        "text_encoding": "cpp"
+        "text_encoding": "cpp",
+        "flat_map": "cpp",
+        "flat_set": "cpp"
     }
 }
