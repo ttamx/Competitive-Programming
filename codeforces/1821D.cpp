@@ -1,65 +1,61 @@
 #include<bits/stdc++.h>
+#include<ext/pb_ds/assoc_container.hpp>
+#include<ext/pb_ds/tree_policy.hpp>
 
 using namespace std;
+using namespace __gnu_pbds;
 
-typedef long long ll;
+using ll = long long;
+using db = long double;
+using vi = vector<int>;
+using vl = vector<ll>;
+using vd = vector<db>;
+using pii = pair<int,int>;
+using pll = pair<ll,ll>;
+using pdd = pair<db,db>;
+const int INF=0x3fffffff;
+// const int MOD=1000000007;
+const int MOD=998244353;
+const ll LINF=0x1fffffffffffffff;
+const db DINF=numeric_limits<db>::infinity();
+const db EPS=1e-9;
+const db PI=acos(db(-1));
 
-const ll N=2e5+5;
+template<class T>
+using ordered_set = tree<T,null_type,less<T>,rb_tree_tag,tree_order_statistics_node_update>;
+template<class T>
+using ordered_multiset = tree<T,null_type,less_equal<T>,rb_tree_tag,tree_order_statistics_node_update>;
 
-ll n;
-
-struct fenwick{
-    ll t[N];
-    void init(){
-        for(ll i=1;i<=n+1;i++)t[i]=0;
-    }
-    void add(ll i,ll v){
-        while(i<=n)t[i]+=v,i+=i&-i;
-    }
-    ll read(ll i){
-        ll res=0;
-        while(i>0)res+=t[i],i-=i&-i;
-        return res;
-    }
-}f,s;
+mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
+mt19937_64 rng64(chrono::steady_clock::now().time_since_epoch().count());
 
 void runcase(){
-    ll k;
+    int n,k;
     cin >> n >> k;
-    f.init();
-    s.init();
-    vector<ll> l(n),r(n);
+    vector<int> l(n),r(n);
     for(auto &x:l)cin >> x;
     for(auto &x:r)cin >> x;
-    vector<pair<ll,ll>> v;
-    for(ll i=0;i<n;i++)v.emplace_back(r[i]-l[i]+1,i);
-    sort(v.rbegin(),v.rend());
-    vector<ll> mp(n);
-    for(ll i=0;i<n;i++)mp[v[i].second]=i+1;
-    ll ans=1e18,sum=0;
-    for(ll i=0;i<n;i++){
-        f.add(mp[i],1);
-        s.add(mp[i],r[i]-l[i]+1);
-        sum+=r[i]-l[i]+1;
-        if(sum<k)continue;
-        ll lo=1,hi=n;
-        while(lo<hi){
-            ll m=(lo+hi)/2;
-            if(s.read(m)>=k){
-                hi=m;
-            }else{
-                lo=m+1;
-            }
+    ll ans=LINF;
+    ll cur=0,base=0;
+    ll single=0;
+    for(int i=0;i<n;i++){
+        ll sz=r[i]-l[i]+1;
+        if(cur+single+sz>=k){
+            ans=min(ans,l[i]+base+2+2*max(0LL,k-cur-sz)+max(0LL,min(k-cur,sz)-1));
         }
-        ans=min(ans,f.read(lo)*2+r[i]-(s.read(lo)-k));
+        if(sz==1){
+            single++;
+        }else{
+            cur+=sz;
+            base+=2;
+        }
     }
-    if(ans==1e18)ans=-1;
-    cout << ans << '\n';
+    cout << (ans<LINF?ans:-1) << "\n";
 }
 
 int main(){
     cin.tie(nullptr)->sync_with_stdio(false);
-    ll t(1);
+    int t(1);
     cin >> t;
     while(t--)runcase();
 }

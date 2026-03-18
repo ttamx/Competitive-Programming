@@ -3,21 +3,21 @@
 using namespace std;
 
 void runcase(){
-    long long n,c;
+    int n,c;
     cin >> n >> c;
-    vector<long long> v;
-    for(int i=1;i<=n;i++){
-        long long x;
-        cin >> x;
-        v.push_back(x+i);
+    vector<int> a(n);
+    for(int i=0;i<n;i++){
+        cin >> a[i];
+        a[i]+=i+1;
     }
-    sort(v.begin(),v.end());
+    sort(a.begin(),a.end());
     int ans=0;
-    for(auto x:v){
-        if(x<=c)c-=x,ans++;
-        else break;
+    for(auto x:a){
+        if(x>c)break;
+        c-=x;
+        ans++;
     }
-    cout << ans << '\n';
+    cout << ans << "\n";
 }
 
 int main(){

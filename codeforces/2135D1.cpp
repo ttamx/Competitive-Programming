@@ -1,0 +1,98 @@
+#include<bits/stdc++.h>
+#include<ext/pb_ds/assoc_container.hpp>
+#include<ext/pb_ds/tree_policy.hpp>
+
+using namespace std;
+using namespace __gnu_pbds;
+
+using ll = long long;
+using db = long double;
+using vi = vector<int>;
+using vl = vector<ll>;
+using vd = vector<db>;
+using pii = pair<int,int>;
+using pll = pair<ll,ll>;
+using pdd = pair<db,db>;
+const int INF=0x3fffffff;
+// const int MOD=1000000007;
+const int MOD=998244353;
+const ll LINF=0x1fffffffffffffff;
+const db DINF=numeric_limits<db>::infinity();
+const db EPS=1e-9;
+const db PI=acos(db(-1));
+
+template<class T>
+using ordered_set = tree<T,null_type,less<T>,rb_tree_tag,tree_order_statistics_node_update>;
+template<class T>
+using ordered_multiset = tree<T,null_type,less_equal<T>,rb_tree_tag,tree_order_statistics_node_update>;
+
+mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
+mt19937_64 rng64(chrono::steady_clock::now().time_since_epoch().count());
+
+const bool LOCAL=false;
+
+void runcase(){
+    int w;
+    if(LOCAL){
+        cin >> w;
+    }
+    auto ask=[&](const vector<int> &a){
+        if(LOCAL){
+            int cur=0,res=1;
+            for(auto x:a){
+                assert(x<=w);
+                if(cur+x<=w){
+                    cur+=x;
+                }else{
+                    res++;
+                    cur=x;
+                }
+            }
+            cerr << "RETURN " << res << "\n";
+            return res;
+        }else{
+            cout << "? " << a.size();
+            for(auto x:a)cout << " " << x;
+            cout << endl;
+        }
+        int res;
+        cin >> res;
+        return res;
+    };
+    auto answer=[&](int x){
+        cout << "! " << x << endl;
+    };
+    int n=100'000;
+    int h=ask(vector<int>(n,1));
+    if(h==1){
+        answer(n);
+        return;
+    }
+    int l=(n-1)/h+1;
+    int r=(n-1)/(h-1);
+    assert(l<=r);
+    if(l==r){
+        answer(l);
+        return;
+    }
+    assert(l*2>r);
+    vector<int> a;
+    int cl=1,cr=r-l;
+    while(cl<=cr){
+        a.emplace_back(cl++);
+        a.emplace_back(l);
+        if(cl>cr)break;
+        a.emplace_back(cr--);
+        a.emplace_back(l);
+    }
+    int v=ask(a);
+    int ans=l+a.size()-v;
+    answer(ans);
+}
+
+int main(){
+    cin.tie(nullptr)->sync_with_stdio(false);
+    int t(1);
+    cin >> t;
+    while(t--)runcase();
+}
