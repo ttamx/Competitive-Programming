@@ -2,14 +2,11 @@
 
 using namespace std;
 
-using PQ = priority_queue<int,vector<int>,greater<int>>;
-
 const int M=1e5+5;
-const int S=200;
+const int S=320;
 
-vector<int> single[M];
-vector<pair<int,int>> upd[M];
-PQ pq[S][S];
+vector<pair<int,int>> ds[M];
+priority_queue<int,vector<int>,greater<int>> pq[S][S];
 
 int main(){
     cin.tie(nullptr)->sync_with_stdio(false);
@@ -19,27 +16,24 @@ int main(){
     for(int i=0;i<n;i++){
         int a,b;
         cin >> a >> b >> c[i];
-        if(a<S){
-            upd[b].emplace_back(a,i);
-        }else{
-            for(int j=b;j<=m;j+=a){
-                single[j].emplace_back(i);
-            }
-        }
+        ds[b].emplace_back(a,i);
     }
     vector<int> ans(n,-1);
     int last=0;
     for(int i=1;i<=m;i++){
-        for(auto [a,j]:upd[i]){
-            pq[a][i%a].emplace(j);
-        }
-        if(i>=last){
-            int idx=n;
-            for(auto j:single[i]){
-                if(ans[j]==-1){
-                    idx=min(idx,j);
+        int idx=n;
+        for(auto [a,j]:ds[i]){
+            if(a<S){
+                pq[a][i%a].emplace(j);
+            }else if(ans[j]==-1){
+                idx=min(idx,j);
+                if(i+a<=m){
+                    ds[i+a].emplace_back(a,j);
                 }
             }
+        }
+        vector<pair<int,int>>().swap(ds[i]);
+        if(i>=last){
             for(int j=1;j<S;j++){
                 auto &q=pq[j][i%j];
                 while(!q.empty()&&ans[q.top()]!=-1){

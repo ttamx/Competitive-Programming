@@ -1,0 +1,1 @@
+exec(f"print({input()})")
