@@ -58,12 +58,52 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 mt19937_64 rng64(chrono::steady_clock::now().time_since_epoch().count());
 
 void runcase(){
-    
+    int n,m,s;
+    cin >> n >> m >> s;
+    s--;
+    vector<vector<pair<int,int>>> adj(n);
+    int id=0;
+    for(int i=0;i<m;i++){
+        int t,u,v;
+        cin >> t >> u >> v;
+        u--,v--;
+        if(t==1){
+            adj[u].emplace_back(v,0);
+        }else{
+            id++;
+            adj[u].emplace_back(v,id);
+            adj[v].emplace_back(u,-id);
+        }
+    }
+    string ans(id,'+');
+    vector<bool> vis(n);
+    function<void(int)> dfs=[&](int u){
+        vis[u]=true;
+        for(auto [v,i]:adj[u]){
+            if(vis[v])continue;
+            if(i)ans[abs(i)-1]=i>0?'+':'-';
+            dfs(v);
+        }
+    };
+    dfs(s);
+    cout << count(ALL(vis),true) << "\n";
+    cout << ans << "\n";
+    vis.assign(n,false);
+    function<void(int)> dfs2=[&](int u){
+        vis[u]=true;
+        for(auto [v,i]:adj[u]){
+            if(vis[v])continue;
+            if(i)ans[abs(i)-1]=i>0?'-':'+';
+            else dfs2(v);
+        }
+    };
+    dfs2(s);
+    cout << count(ALL(vis),true) << "\n";
+    cout << ans << "\n";
 }
 
 int main(){
     cin.tie(nullptr)->sync_with_stdio(false);
     int t(1);
-    cin >> t;
     while(t--)runcase();
 }

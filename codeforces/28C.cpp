@@ -58,12 +58,35 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 mt19937_64 rng64(chrono::steady_clock::now().time_since_epoch().count());
 
 void runcase(){
-    
+    int n,m;
+    cin >> n >> m;
+    vector<int> a(m);
+    for(auto &x:a)cin >> x;
+    vvv(db,dp,m+1,n+1,n+1);
+    dp[0][0][0]=1;
+    for(int i=1;i<=m;i++){
+        for(int j=0;j<=n;j++){
+            for(int k=0;k<=n;k++){
+                db prob=1;
+                int rem=n-j;
+                dp[i][j][k]+=dp[i-1][j][k];
+                for(int x=1;x<=rem;x++){
+                    prob*=db(rem-x+1)/db(x*m);
+                    int v=(x+a[i-1]-1)/a[i-1];
+                    dp[i][j+x][max(k,v)]+=dp[i-1][j][k]*prob;
+                }
+            }
+        }
+    }
+    db ans=0;
+    for(int i=0;i<=n;i++){
+        ans+=dp[m][n][i]*i;
+    }
+    cout << fixed << setprecision(12) << ans << "\n";
 }
 
 int main(){
     cin.tie(nullptr)->sync_with_stdio(false);
     int t(1);
-    cin >> t;
     while(t--)runcase();
 }

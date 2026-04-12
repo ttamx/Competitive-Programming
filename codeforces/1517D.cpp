@@ -58,12 +58,62 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 mt19937_64 rng64(chrono::steady_clock::now().time_since_epoch().count());
 
 void runcase(){
-    
+    int n,m,k;
+    cin >> n >> m >> k;
+    vv(int,a,n,m-1);
+    for(auto &v:a){
+        for(auto &x:v){
+            cin >> x;
+        }
+    }
+    vv(int,b,n-1,m);
+    for(auto &v:b){
+        for(auto &x:v){
+            cin >> x;
+        }
+    }
+    if(k%2){
+        for(int i=0;i<n;i++){
+            for(int j=0;j<m;j++){
+                cout << -1 << " \n"[j==m-1];
+            }
+        }
+        return;
+    }
+    k/=2;
+    vvv(int,dp,k+1,n,m,INF);
+    for(int i=0;i<n;i++){
+        for(int j=0;j<m;j++){
+            dp[0][i][j]=0;
+        }
+    }
+    for(int x=1;x<=k;x++){
+        for(int i=0;i<n;i++){
+            for(int j=0;j+1<m;j++){
+                chmin(dp[x][i][j],dp[x-1][i][j+1]+a[i][j]);
+                chmin(dp[x][i][j],dp[x-1][i][j]+a[i][j]);
+                chmin(dp[x][i][j+1],dp[x-1][i][j]+a[i][j]);
+                chmin(dp[x][i][j+1],dp[x-1][i][j+1]+a[i][j]);
+            }
+        }
+        for(int i=0;i+1<n;i++){
+            for(int j=0;j<m;j++){
+                chmin(dp[x][i][j],dp[x-1][i+1][j]+b[i][j]);
+                chmin(dp[x][i][j],dp[x-1][i][j]+b[i][j]);
+                chmin(dp[x][i+1][j],dp[x-1][i][j]+b[i][j]);
+                chmin(dp[x][i+1][j],dp[x-1][i+1][j]+b[i][j]);
+            }
+        }
+    }
+    for(int i=0;i<n;i++){
+        for(int j=0;j<m;j++){
+            cout << dp[k][i][j]*2 << " \n"[j==m-1];
+        }
+    }
 }
 
 int main(){
     cin.tie(nullptr)->sync_with_stdio(false);
     int t(1);
-    cin >> t;
     while(t--)runcase();
 }

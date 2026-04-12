@@ -58,12 +58,16 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 mt19937_64 rng64(chrono::steady_clock::now().time_since_epoch().count());
 
 void runcase(){
-    
+    int n;
+    string s;
+    cin >> n >> s;
+    int p=0;
+    while(p<n&&s[p]=='o')p++;
+    cout << s.substr(p,n) << "\n";
 }
 
 int main(){
     cin.tie(nullptr)->sync_with_stdio(false);
     int t(1);
-    cin >> t;
     while(t--)runcase();
 }

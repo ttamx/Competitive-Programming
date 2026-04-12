@@ -1,9 +1,9 @@
 #include<bits/stdc++.h>
-#define sz(x) (int)(x).size()
-#define all(x) (x).begin(),(x).end()
-#define rall(x) (x).rbegin(),(x).rend()
+#include<ext/pb_ds/assoc_container.hpp>
+#include<ext/pb_ds/tree_policy.hpp>
 
 using namespace std;
+using namespace __gnu_pbds;
 
 using ll = long long;
 using db = long double;
@@ -21,25 +21,20 @@ const db DINF=numeric_limits<db>::infinity();
 const db EPS=1e-9;
 const db PI=acos(db(-1));
 
+template<class T>
+using ordered_set = tree<T,null_type,less<T>,rb_tree_tag,tree_order_statistics_node_update>;
+template<class T>
+using ordered_multiset = tree<T,null_type,less_equal<T>,rb_tree_tag,tree_order_statistics_node_update>;
+
+mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
+mt19937_64 rng64(chrono::steady_clock::now().time_since_epoch().count());
+
 void runcase(){
-    int n,m,k;
-    cin >> n >> m >> k;
-    vector<int> a(n);
-    for(auto &x:a)cin >> x;
-    sort(a.begin(),a.end());
-    ll ans=1LL*k*(k-1)/2;
-    for(auto x:a){
-        int t=min(m,k);
-        ans+=1LL*t*x;
-        ans-=1LL*t*(t-1)/2;
-        k-=t;
-    }
-    cout << ans << "\n";
+    cout << "C2\n";
 }
 
 int main(){
     cin.tie(nullptr)->sync_with_stdio(false);
     int t(1);
-    cin >> t;
     while(t--)runcase();
 }

@@ -58,12 +58,27 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 mt19937_64 rng64(chrono::steady_clock::now().time_since_epoch().count());
 
 void runcase(){
-    
+    ll n,a,b;
+    cin >> n >> a >> b;
+    n*=6;
+    tuple<ll,ll,ll> ans(LINF,a,b);
+    for(ll x=1;x*x<=n;x++){
+        ll aa=max(a,x);
+        ll bb=max(b,(n+x-1)/x);
+        ans=min(ans,mt(aa*bb,aa,bb));
+    }
+    for(ll x=1;x*x<=n;x++){
+        ll aa=max(a,(n+x-1)/x);
+        ll bb=max(b,x);
+        ans=min(ans,mt(aa*bb,aa,bb));
+    }
+    auto [x,y,z]=ans;
+    cout << x << "\n";
+    cout << y << " " << z << "\n";
 }
 
 int main(){
     cin.tie(nullptr)->sync_with_stdio(false);
     int t(1);
-    cin >> t;
     while(t--)runcase();
 }

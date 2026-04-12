@@ -58,7 +58,53 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 mt19937_64 rng64(chrono::steady_clock::now().time_since_epoch().count());
 
 void runcase(){
-    
+    int n;
+    cin >> n;
+    vector<vector<int>> adj(n);
+    for(int i=0;i<n-1;i++){
+        int u,v;
+        cin >> u >> v;
+        u--,v--;
+        adj[u].eb(v);
+        adj[v].eb(u);
+    }
+    int cur=0;
+    vector<int> sz(n),dep(n),par(n,-1),ans(n),ord;
+    pair<int,int> opt(INF,-1);
+    function<int(int,int)> dfs=[&](int u,int p){
+        sz[u]=1;
+        for(auto v:adj[u])if(v!=p)sz[u]+=dfs(v,u);
+        return sz[u];
+    };
+    function<int(int,int)> centroid=[&](int u,int p){
+        for(auto v:adj[u])if(v!=p&&sz[v]*2>n)return centroid(v,u);
+        return u;
+    };
+    function<void(int,int)> dfs2=[&](int u,int p){
+        ord.emplace_back(u);
+        for(auto v:adj[u])if(v!=p){
+            par[v]=u;
+            dep[v]=dep[u]+1;
+            dfs2(v,u);
+        }
+    };
+    dfs(0,-1);
+    int c=centroid(0,-1);
+    dfs(c,-1);
+    dfs2(c,-1);
+    for(int i=0;i<n;i++){
+        if(i!=c){
+            opt=min(opt,mp(sz[i]+dep[i],i));
+        }
+    }
+    auto [u,v]=minmax(opt.second,par[opt.second]);
+    ord.erase(find(ALL(ord),v));
+    for(int i=0;i<n/2;i++){
+        ans[ord[i]]=ans[ord[i+n/2]]=i+1;
+    }
+    cout << u+1 << " " << v+1 << "\n";
+    for(auto x:ans)cout << x << " ";
+    cout << "\n";
 }
 
 int main(){

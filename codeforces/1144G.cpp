@@ -57,13 +57,48 @@ T SUM(const U &a){return accumulate(ALL(a),T{});}
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 mt19937_64 rng64(chrono::steady_clock::now().time_since_epoch().count());
 
-void runcase(){
-    
-}
+const int N=2e5+5;
+
+int n;
+int a[N];
+int dp[N][2],pre[N][2];
+int ans[N];
 
 int main(){
     cin.tie(nullptr)->sync_with_stdio(false);
-    int t(1);
-    cin >> t;
-    while(t--)runcase();
+    cin >> n;
+    for(int i=1;i<=n;i++){
+        cin >> a[i];
+    }
+    dp[1][0]=INF;
+    dp[1][1]=-INF;
+    for(int i=2;i<=n;i++){
+        dp[i][0]=-INF;
+        dp[i][1]=INF;
+        if(a[i-1]<a[i]&&chmax(dp[i][0],dp[i-1][0])){
+            pre[i][0]=0;
+        }
+        if(dp[i-1][1]<a[i]&&chmax(dp[i][0],a[i-1])){
+            pre[i][0]=1;
+        }
+        if(a[i-1]>a[i]&&chmin(dp[i][1],dp[i-1][1])){
+            pre[i][1]=1;
+        }
+        if(dp[i-1][0]>a[i]&&chmin(dp[i][1],a[i-1])){
+            pre[i][1]=0;
+        }
+    }
+    if(dp[n][0]==-INF&&dp[n][1]==INF){
+        cout << "NO\n";
+        exit(0);
+    }
+    cout << "YES\n";
+    int j=dp[n][1]<INF;
+    for(int i=n;i>=1;i--){
+        ans[i]=j;
+        j=pre[i][j];
+    }
+    for(int i=1;i<=n;i++){
+        cout << ans[i] << " \n"[i==n];
+    }
 }

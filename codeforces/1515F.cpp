@@ -57,13 +57,64 @@ T SUM(const U &a){return accumulate(ALL(a),T{});}
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 mt19937_64 rng64(chrono::steady_clock::now().time_since_epoch().count());
 
-void runcase(){
-    
+const int N=3e5+5;
+
+int n,m,k;
+ll a[N];
+vector<pair<int,int>> adj[N];
+int fa[N];
+priority_queue<pair<ll,int>> pq;
+vector<int> ans;
+
+int fp(int u){
+    return fa[u]=fa[u]==u?u:fp(fa[u]);
 }
+
 
 int main(){
     cin.tie(nullptr)->sync_with_stdio(false);
-    int t(1);
-    cin >> t;
-    while(t--)runcase();
+    cin >> n >> m >> k;
+    for(int i=1;i<=n;i++){
+        cin >> a[i];
+    }
+    for(int i=1;i<=m;i++){
+        int u,v;
+        cin >> u >> v;
+        adj[u].emplace_back(v,i);
+        adj[v].emplace_back(u,i);
+    }
+    for(int i=1;i<=n;i++){
+        fa[i]=i;
+    }
+    for(int i=1;i<=n;i++){
+        pq.emplace(a[i],i);
+    }
+    while(!pq.empty()){
+        auto [val,u]=pq.top();
+        pq.pop();
+        if(u!=fp(u)||val!=a[u])continue;
+        while(!adj[u].empty()&&fp(adj[u].back().first)==u){
+            adj[u].pop_back();
+        }
+        if(!adj[u].empty()){
+            auto [v,i]=adj[u].back();
+            v=fp(v);
+            ans.emplace_back(i);
+            if(adj[u].size()<adj[v].size()){
+                swap(u,v);
+            }
+            adj[u].insert(adj[u].end(),adj[v].begin(),adj[v].end());
+            fa[v]=u;
+            a[u]+=a[v]-k;
+            if(a[u]<0){
+                cout << "NO\n";
+                exit(0);
+            }
+            pq.emplace(a[u],u);
+        }
+    }
+    cout << "YES\n";
+    for(auto x:ans){
+        cout << x << "\n";
+    }
 }

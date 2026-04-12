@@ -57,13 +57,76 @@ T SUM(const U &a){return accumulate(ALL(a),T{});}
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 mt19937_64 rng64(chrono::steady_clock::now().time_since_epoch().count());
 
-void runcase(){
-    
+const int N=1005;
+
+int n=999,m=500;
+int x,y;
+int a[N][N];
+int px[N],py[N];
+int row[N],col[N];
+int cnt[2][2];
+
+void update(int x,int y,int v){
+    a[x][y]+=v;
+    row[x]+=v;
+    col[y]+=v;
+}
+
+void query(int xx,int yy){
+    if(a[xx][yy]){
+        for(int dx=-1;dx<=1;dx++){
+            for(int dy=-1;dy<=1;dy++){
+                int nx=x+dx,ny=y+dy;
+                if(!a[nx][ny]&&(row[nx]||col[ny])){
+                    xx=nx;
+                    yy=ny;
+                }
+            }
+        }
+    }
+    cout << xx << " " << yy << endl;
+    x=xx,y=yy;
+    int k,nx,ny;
+    cin >> k >> nx >> ny;
+    if(k==-1)exit(0);
+    update(px[k],py[k],-1);
+    px[k]=nx,py[k]=ny;
+    update(px[k],py[k],+1);
+}
+
+void go(int xx,int yy){
+    while(x!=xx||y!=yy){
+        int nx=x,ny=y;
+        if(x<xx)nx++;
+        if(x>xx)nx--;
+        if(y<yy)ny++;
+        if(y>yy)ny--;
+        query(nx,ny);
+    }
 }
 
 int main(){
     cin.tie(nullptr)->sync_with_stdio(false);
-    int t(1);
-    cin >> t;
-    while(t--)runcase();
+    cin >> x >> y;
+    for(int i=1;i<=666;i++){
+        cin >> px[i] >> py[i];
+        update(px[i],py[i],+1);
+    }
+    go(m,m);
+    for(int i=1;i<=n;i++){
+        for(int j=1;j<=n;j++){
+            cnt[i>m][j>m]+=a[i][j];
+        }
+    }
+    int mn=INF,xx=0,yy=0;
+    for(int i=0;i<2;i++){
+        for(int j=0;j<2;j++){
+            if(cnt[i][j]<mn){
+                mn=cnt[i][j];
+                xx=i?1:n;
+                yy=j?1:n;
+            }
+        }
+    }
+    go(xx,yy);
 }

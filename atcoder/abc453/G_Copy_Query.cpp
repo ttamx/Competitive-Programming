@@ -57,13 +57,64 @@ T SUM(const U &a){return accumulate(ALL(a),T{});}
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 mt19937_64 rng64(chrono::steady_clock::now().time_since_epoch().count());
 
-void runcase(){
-    
+struct Node;
+using Ptr = Node*;
+struct Node{
+    ll val;
+    Ptr l,r;
+    Node():val(0),l(),r(){}
+};
+
+void build(int l,int r,Ptr &t){
+    t=new Node();
+    if(l==r)return;
+    int m=(l+r)/2;
+    build(l,m,t->l);
+    build(m+1,r,t->r);
+    t->val=t->l->val+t->r->val;
 }
+
+void modify(int l,int r,Ptr &t,Ptr o,int x,int v){
+    t=new Node(*o);
+    if(l==r)return void(t->val=v);
+    int m=(l+r)/2;
+    if(x<=m)modify(l,m,t->l,o->l,x,v);
+    else modify(m+1,r,t->r,o->r,x,v);
+    t->val=t->l->val+t->r->val;
+}
+
+ll query(int l,int r,Ptr t,int x,int y){
+    if(y<l||r<x)return 0;
+    if(x<=l&&r<=y)return t->val;
+    int m=(l+r)/2;
+    return query(l,m,t->l,x,y)+query(m+1,r,t->r,x,y);
+}
+
+const int N=2e5+5;
+
+int n,m,q;
+Ptr root[N];
 
 int main(){
     cin.tie(nullptr)->sync_with_stdio(false);
-    int t(1);
-    cin >> t;
-    while(t--)runcase();
+    cin >> n >> m >> q;
+    build(1,m,root[1]);
+    for(int i=2;i<=n;i++)root[i]=root[i-1];
+    while(q--){
+        int op;
+        cin >> op;
+        if(op==1){
+            int x,y;
+            cin >> x >> y;
+            root[x]=root[y];
+        }else if(op==2){
+            int x,y,v;
+            cin >> x >> y >> v;
+            modify(1,m,root[x],root[x],y,v);
+        }else{
+            int x,l,r;
+            cin >> x >> l >> r;
+            cout << query(1,m,root[x],l,r) << "\n";
+        }
+    }
 }

@@ -57,13 +57,62 @@ T SUM(const U &a){return accumulate(ALL(a),T{});}
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 mt19937_64 rng64(chrono::steady_clock::now().time_since_epoch().count());
 
-void runcase(){
-    
-}
+const int N=1005;
+
+int dx[4]={-1,0,1,0};
+int dy[4]={0,-1,0,1};
+string dir="ULDR";
+
+int n,m;
+string a[N];
+bool vis[N][N][4];
+tuple<int,int,int> par[N][N][4];
+int si,sj;
+queue<tuple<int,int,int>> q;
 
 int main(){
     cin.tie(nullptr)->sync_with_stdio(false);
-    int t(1);
-    cin >> t;
-    while(t--)runcase();
+    cin >> n >> m;
+    for(int i=0;i<n;i++){
+        cin >> a[i];
+        for(int j=0;j<m;j++){
+            if(a[i][j]=='S'){
+                si=i,sj=j;
+            }
+        }
+    }
+    for(int d=0;d<4;d++){
+        int ii=si+dx[d];
+        int jj=sj+dy[d];
+        if(ii<0||ii>=n||jj<0||jj>=m||a[ii][jj]=='#'||vis[ii][jj][d])continue;
+        vis[ii][jj][d]=true;
+        par[ii][jj][d]={si,sj,-1};
+        q.emplace(ii,jj,d);
+    }
+    while(!q.empty()){
+        auto [i,j,k]=q.front();
+        q.pop();
+        if(a[i][j]=='G'){
+            string ans="";
+            while(k!=-1){
+                ans.pb(dir[k]);
+                tie(i,j,k)=par[i][j][k];
+            }
+            REV(ans);
+            cout << "Yes\n";
+            cout << ans << "\n";
+            exit(0);
+        }
+        for(int d=0;d<4;d++){
+            int ii=i+dx[d];
+            int jj=j+dy[d];
+            if(ii<0||ii>=n||jj<0||jj>=m||a[ii][jj]=='#'||vis[ii][jj][d])continue;
+            if(a[i][j]=='o'&&d!=k)continue;
+            if(a[i][j]=='x'&&d==k)continue;
+            vis[ii][jj][d]=true;
+            par[ii][jj][d]={i,j,k};
+            q.emplace(ii,jj,d);
+        }
+    }
+    cout << "No\n";
 }
