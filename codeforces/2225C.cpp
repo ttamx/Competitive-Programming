@@ -53,7 +53,18 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 mt19937_64 rng64(chrono::steady_clock::now().time_since_epoch().count());
 
 void runcase(){
-    
+    int n;
+    cin >> n;
+    string a,b;
+    cin >> a >> b;
+    vector<int> dp(n+1);
+    for(int i=0;i<n;i++){
+        dp[i+1]=dp[i]+(a[i]!=b[i]);
+        if(i>0){
+            dp[i+1]=min(dp[i+1],dp[i-1]+(a[i]!=a[i-1])+(b[i]!=b[i-1]));
+        }
+    }
+    cout << dp[n] << "\n";
 }
 
 int main(){

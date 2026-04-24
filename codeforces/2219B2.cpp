@@ -1,6 +1,9 @@
 #include<bits/stdc++.h>
+#include<ext/pb_ds/assoc_container.hpp>
+#include<ext/pb_ds/tree_policy.hpp>
 
 using namespace std;
+using namespace __gnu_pbds;
 
 #define pb push_back
 #define eb emplace_back
@@ -37,6 +40,8 @@ const db PI=acos(db(-1));
 
 template<class T>
 using PQ = priority_queue<T,vector<T>,greater<T>>;
+template<class T>
+using ordered_set = tree<T,null_type,less<T>,rb_tree_tag,tree_order_statistics_node_update>;
 
 #define vv(T,a,n,...) vector<vector<T>> a(n,vector<T>(__VA_ARGS__))
 #define vvv(T,a,n,m,...) vector<vector<vector<T>>> a(n,vector<vector<T>>(m,vector<T>(__VA_ARGS__)))
@@ -53,7 +58,34 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 mt19937_64 rng64(chrono::steady_clock::now().time_since_epoch().count());
 
 void runcase(){
-    
+    int n;
+    cin >> n;
+    auto ask=[&](vector<int> a){
+        if(a.empty())return 0;
+        cout << "? " << SZ(a);
+        for(auto x:a)cout << " " << x+1;
+        cout << endl;
+        int res;
+        cin >> res;
+        return (res^SZ(a))&1;
+    };
+    vector<int> a(2*n+1),ans;
+    iota(ALL(a),0);
+    for(int t=0;t<3;t++){
+        int l=t,r=2*n;
+        while(l<r){
+            int m=(l+r)/2;
+            vector<int> b;
+            for(int i=0;i<=m;i++)b.eb(a[i]);
+            if(ask(b))r=m;
+            else l=m+1;
+        }
+        ans.eb(a[l]);
+        swap(a[l],a[t]);
+    }
+    cout << "!";
+    for(auto x:ans)cout << " " << x+1;
+    cout << endl;
 }
 
 int main(){

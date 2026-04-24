@@ -53,12 +53,39 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 mt19937_64 rng64(chrono::steady_clock::now().time_since_epoch().count());
 
 void runcase(){
-    
+    int n;
+    cin >> n;
+    vector<string> a(n);
+    for(auto &x:a)cin >> x;
+    ll ans=0;
+    for(char c='a';c<='z';c++){
+        ll len=0;
+        for(auto &s:a){
+            int l=0,r=SZ(s)-1;
+            while(l<SZ(s)&&s[l]==c)l++;
+            while(r>=0&&s[r]==c)r--;
+            if(l==SZ(s)){
+                len+=(len+1)*l;
+            }else if(len>0){
+                len=l+SZ(s)-r;
+            }else{
+                len=min(l,SZ(s)-r-1);
+            }
+            for(int i=0;i<SZ(s);i++)if(s[i]==c){
+                int j=i+1;
+                while(j<SZ(s)&&s[j]==c)j++;
+                len=max(len,(ll)j-i);
+                i=j-1;
+            }
+            len=min(len,(ll)2e9);
+        }
+        ans=max(ans,len);
+    }
+    cout << ans << "\n";
 }
 
 int main(){
     cin.tie(nullptr)->sync_with_stdio(false);
     int t(1);
-    cin >> t;
     while(t--)runcase();
 }

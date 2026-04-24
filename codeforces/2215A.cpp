@@ -1,6 +1,9 @@
 #include<bits/stdc++.h>
+#include<ext/pb_ds/assoc_container.hpp>
+#include<ext/pb_ds/tree_policy.hpp>
 
 using namespace std;
+using namespace __gnu_pbds;
 
 #define pb push_back
 #define eb emplace_back
@@ -37,6 +40,8 @@ const db PI=acos(db(-1));
 
 template<class T>
 using PQ = priority_queue<T,vector<T>,greater<T>>;
+template<class T>
+using ordered_set = tree<T,null_type,less<T>,rb_tree_tag,tree_order_statistics_node_update>;
 
 #define vv(T,a,n,...) vector<vector<T>> a(n,vector<T>(__VA_ARGS__))
 #define vvv(T,a,n,m,...) vector<vector<vector<T>>> a(n,vector<vector<T>>(m,vector<T>(__VA_ARGS__)))
@@ -53,7 +58,25 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 mt19937_64 rng64(chrono::steady_clock::now().time_since_epoch().count());
 
 void runcase(){
-    
+    int n,k,p,q;
+    cin >> n >> k >> p >> q;
+    vector<int> a(n);
+    for(auto &x:a){
+        cin >> x;
+    }
+    ll base=0,ans=LINF;
+    for(auto &x:a)base+=min(x%p%q,x%q%p);
+    for(int t=0;t<2;t++){
+        vector<ll> f(n+1);
+        for(int i=0;i<n;i++){
+            f[i+1]=f[i]+a[i]%p%q-min(a[i]%p%q,a[i]%q%p);
+        }
+        for(int i=k;i<=n;i++){
+            ans=min(ans,base+f[i]-f[i-k]);
+        }
+        swap(p,q);
+    }
+    cout << ans << "\n";
 }
 
 int main(){

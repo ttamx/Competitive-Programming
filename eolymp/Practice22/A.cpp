@@ -1,6 +1,9 @@
 #include<bits/stdc++.h>
+#include<ext/pb_ds/assoc_container.hpp>
+#include<ext/pb_ds/tree_policy.hpp>
 
 using namespace std;
+using namespace __gnu_pbds;
 
 #define pb push_back
 #define eb emplace_back
@@ -37,6 +40,8 @@ const db PI=acos(db(-1));
 
 template<class T>
 using PQ = priority_queue<T,vector<T>,greater<T>>;
+template<class T>
+using ordered_set = tree<T,null_type,less<T>,rb_tree_tag,tree_order_statistics_node_update>;
 
 #define vv(T,a,n,...) vector<vector<T>> a(n,vector<T>(__VA_ARGS__))
 #define vvv(T,a,n,m,...) vector<vector<vector<T>>> a(n,vector<vector<T>>(m,vector<T>(__VA_ARGS__)))
@@ -53,7 +58,23 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 mt19937_64 rng64(chrono::steady_clock::now().time_since_epoch().count());
 
 void runcase(){
-    
+    int n;
+    cin >> n;
+    string s,t;
+    cin >> s >> t;
+    int ans=INF;
+    for(int i=0;i<n;i++){
+        int res=0;
+        for(int j=0;j<n;j++)if(s[j]!=t[j]){
+            int k=j+1;
+            while(k<n&&s[k]!=t[k])k++;
+            res+=(k-j)*(k-j+1)/2;
+            k=j-1;
+        }
+        ans=min(ans,res);
+        rotate(t.begin(),t.begin()+1,t.end());
+    }
+    cout << ans << "\n";
 }
 
 int main(){

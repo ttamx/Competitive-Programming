@@ -53,7 +53,19 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 mt19937_64 rng64(chrono::steady_clock::now().time_since_epoch().count());
 
 void runcase(){
-    
+    string s;
+    cin >> s;
+    int n=SZ(s);
+    int l=1,r=n-2;
+    while(l<n&&s[l]!=s[l-1])l++;
+    while(r>=0&&s[r]!=s[r+1])r--;
+    for(int i=l;i<r;i++){
+        if(s[i]==s[i+1]){
+            cout << "NO\n";
+            return;
+        }
+    }
+    cout << "YES\n";
 }
 
 int main(){

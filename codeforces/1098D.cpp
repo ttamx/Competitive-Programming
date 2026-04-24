@@ -1,6 +1,9 @@
 #include<bits/stdc++.h>
+#include<ext/pb_ds/assoc_container.hpp>
+#include<ext/pb_ds/tree_policy.hpp>
 
 using namespace std;
+using namespace __gnu_pbds;
 
 #define pb push_back
 #define eb emplace_back
@@ -37,6 +40,8 @@ const db PI=acos(db(-1));
 
 template<class T>
 using PQ = priority_queue<T,vector<T>,greater<T>>;
+template<class T>
+using ordered_set = tree<T,null_type,less<T>,rb_tree_tag,tree_order_statistics_node_update>;
 
 #define vv(T,a,n,...) vector<vector<T>> a(n,vector<T>(__VA_ARGS__))
 #define vvv(T,a,n,m,...) vector<vector<vector<T>>> a(n,vector<vector<T>>(m,vector<T>(__VA_ARGS__)))
@@ -52,13 +57,34 @@ T SUM(const U &a){return accumulate(ALL(a),T{});}
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 mt19937_64 rng64(chrono::steady_clock::now().time_since_epoch().count());
 
-void runcase(){
-    
+const int K=30;
+
+int n,q;
+ll sum[K];
+multiset<int> ds[K];
+
+void update(int x,int v){
+    int i=31-__builtin_clz(x);
+    sum[i]+=x*v;
+    if(v>0)ds[i].emplace(x);
+    else ds[i].extract(x);
+    n+=v;
 }
 
 int main(){
     cin.tie(nullptr)->sync_with_stdio(false);
-    int t(1);
-    cin >> t;
-    while(t--)runcase();
+    cin >> q;
+    while(q--){
+        char c;
+        int x;
+        cin >> c >> x;
+        update(x,c=='+'?1:-1);
+        int ans=n;
+        ll tot=0;
+        for(int i=0;i<K;i++){
+            if(!ds[i].empty()&&tot*2<*ds[i].begin())ans--;
+            tot+=sum[i];
+        }
+        cout << ans << "\n";
+    }
 }

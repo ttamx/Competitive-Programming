@@ -1,6 +1,9 @@
 #include<bits/stdc++.h>
+#include<ext/pb_ds/assoc_container.hpp>
+#include<ext/pb_ds/tree_policy.hpp>
 
 using namespace std;
+using namespace __gnu_pbds;
 
 #define pb push_back
 #define eb emplace_back
@@ -37,6 +40,8 @@ const db PI=acos(db(-1));
 
 template<class T>
 using PQ = priority_queue<T,vector<T>,greater<T>>;
+template<class T>
+using ordered_set = tree<T,null_type,less<T>,rb_tree_tag,tree_order_statistics_node_update>;
 
 #define vv(T,a,n,...) vector<vector<T>> a(n,vector<T>(__VA_ARGS__))
 #define vvv(T,a,n,m,...) vector<vector<vector<T>>> a(n,vector<vector<T>>(m,vector<T>(__VA_ARGS__)))
@@ -53,7 +58,27 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 mt19937_64 rng64(chrono::steady_clock::now().time_since_epoch().count());
 
 void runcase(){
-    
+    ll p,q;
+    cin >> p >> q;
+    ll tot=p+2*q;
+    for(ll n=1;;n++){
+        ll req=(n+1)*n*2;
+        if(req>tot)break;
+        ll pp=p,qq=q;
+        ll used=min(req/2,qq);
+        qq-=used;
+        req-=used*2;
+        pp-=req;
+        ll w=qq/n;
+        qq-=w*n;
+        pp-=w;
+        if(pp<0)continue;
+        pp+=qq*2;
+        if(pp%(2*n+1)!=0)continue;
+        cout << n << " " << n+w+pp/(2*n+1) << "\n";
+        return;
+    }
+    cout << -1 << "\n";
 }
 
 int main(){

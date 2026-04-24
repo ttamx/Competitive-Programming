@@ -53,7 +53,59 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 mt19937_64 rng64(chrono::steady_clock::now().time_since_epoch().count());
 
 void runcase(){
-    
+    int n,k;
+    cin >> n >> k;
+    vector<int> a(n),b(n);
+    for(int i=0;i<n;i++){
+        cin >> a[i] >> b[i];;
+    }
+    int opt=-1;
+    vector<int> ans;
+    vector<int> ord(n);
+    iota(ALL(ord),0);
+    shuffle(ALL(ord),rng);
+    for(int t=2e5;t>0;t--){
+        int i=rng()%n,j=rng()%n;
+        while(i==j)i=rng()%n,j=rng()%n;
+        swap(ord[i],ord[j]);
+        int sum=0,lz=0;
+        PQ<int> pq;
+        bool ok=false;
+        for(int i=0;i<n;i++){
+            int j=ord[i];
+            if(SZ(pq)==k){
+                sum-=pq.top();
+                pq.pop();
+            }
+            lz+=b[j];
+            sum+=a[j]-lz;
+            pq.emplace(a[j]-lz);
+            int res=sum+lz*SZ(pq);
+            if(res>opt){
+                ok=true;
+                opt=res;
+                ans=vector<int>(ord.begin(),ord.begin()+i+1);
+            }
+        }
+        if(!ok)swap(ord[i],ord[j]);
+    }
+    vector<int> out;
+    PQ<pair<int,int>> pq;
+    int lz=0;
+    for(auto i:ans){
+        if(SZ(pq)==k){
+            out.eb(-pq.top().second-1);
+            pq.pop();
+        }
+        lz+=b[i];
+        pq.emplace(a[i]-lz,i);
+        out.eb(i+1);
+    }
+    cout << SZ(out) << "\n";
+    for(auto i:out){
+        cout << i << " ";
+    }
+    cout << "\n";
 }
 
 int main(){

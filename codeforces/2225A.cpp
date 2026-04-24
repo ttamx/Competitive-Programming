@@ -53,7 +53,14 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 mt19937_64 rng64(chrono::steady_clock::now().time_since_epoch().count());
 
 void runcase(){
-    
+    ll x,y;
+    cin >> x >> y;
+    ll z=y-x;
+    if(z>x&&y%z!=0){
+        cout << "YES\n";
+    }else{
+        cout << "NO\n";
+    }
 }
 
 int main(){

@@ -1,6 +1,9 @@
 #include<bits/stdc++.h>
+#include<ext/pb_ds/assoc_container.hpp>
+#include<ext/pb_ds/tree_policy.hpp>
 
 using namespace std;
+using namespace __gnu_pbds;
 
 #define pb push_back
 #define eb emplace_back
@@ -37,6 +40,8 @@ const db PI=acos(db(-1));
 
 template<class T>
 using PQ = priority_queue<T,vector<T>,greater<T>>;
+template<class T>
+using ordered_set = tree<T,null_type,less<T>,rb_tree_tag,tree_order_statistics_node_update>;
 
 #define vv(T,a,n,...) vector<vector<T>> a(n,vector<T>(__VA_ARGS__))
 #define vvv(T,a,n,m,...) vector<vector<vector<T>>> a(n,vector<vector<T>>(m,vector<T>(__VA_ARGS__)))
@@ -53,7 +58,36 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 mt19937_64 rng64(chrono::steady_clock::now().time_since_epoch().count());
 
 void runcase(){
-    
+    int n,m;
+    cin >> n >> m;
+    set<int> s;
+    for(int i=0;i<n;i++){
+        int x;
+        cin >> x;
+        if(!s.emplace(x).second)s.erase(x);
+    }
+    vector<int> a;
+    for(auto x:s)a.eb(x);
+    n=s.size();
+    if(n%2==0){
+        int sum=0;
+        for(int i=0;i<n;i+=2)sum+=a[i+1]-a[i];
+        cout << min(sum,m-sum) << "\n";
+    }else{
+        int sum=0;
+        for(int i=0;i+1<n;i+=2)sum+=a[i+1]-a[i];
+        int ans=min(sum,m-sum);
+        for(int i=n-1;i>0;i--){
+            if(i%2==0){
+                sum+=a[i]-a[i-1];
+            }else{
+                sum-=a[i]-a[i-1];
+            }
+            chmin(ans,sum);
+            chmin(ans,m-sum);
+        }
+        cout << ans << "\n";
+    }
 }
 
 int main(){

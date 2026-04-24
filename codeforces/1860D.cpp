@@ -18,6 +18,7 @@ using namespace std;
 #define SZ(a) (int)(a.size())
 #define LB(a,x) (int)(lower_bound(ALL(a),x)-a.begin())
 #define UB(a,x) (int)(upper_bound(ALL(a),x)-a.begin())
+#define COUNT(a,x) count(ALL(a),x)
 #define MIN(a) *min_element(ALL(a))
 #define MAX(a) *max_element(ALL(a))
 
@@ -53,12 +54,30 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 mt19937_64 rng64(chrono::steady_clock::now().time_since_epoch().count());
 
 void runcase(){
-    
+    string s;
+    cin >> s;
+    int n=SZ(s);
+    int cnt=COUNT(s,'1');
+    int k=cnt*(n-cnt)/2;
+    vv(int,dp,cnt+1,k+1,INF);
+    dp[0][0]=0;
+    for(int i=0;i<n;i++){
+        vv(int,ndp,cnt+1,k+1,INF);
+        for(int j=0;j<=cnt;j++){
+            for(int x=0;x<=k;x++){
+                for(int v=0;v<2;v++){
+                    int t=x+j*(1-v);
+                    if(j+v<=cnt&&t<=k)chmin(ndp[j+v][t],dp[j][x]+(s[i]-'0'!=v));
+                }
+            }
+        }
+        dp=move(ndp);
+    }
+    cout << dp[cnt][k]/2 << "\n";
 }
 
 int main(){
     cin.tie(nullptr)->sync_with_stdio(false);
     int t(1);
-    cin >> t;
     while(t--)runcase();
 }

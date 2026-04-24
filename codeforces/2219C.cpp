@@ -1,6 +1,9 @@
 #include<bits/stdc++.h>
+#include<ext/pb_ds/assoc_container.hpp>
+#include<ext/pb_ds/tree_policy.hpp>
 
 using namespace std;
+using namespace __gnu_pbds;
 
 #define pb push_back
 #define eb emplace_back
@@ -37,6 +40,8 @@ const db PI=acos(db(-1));
 
 template<class T>
 using PQ = priority_queue<T,vector<T>,greater<T>>;
+template<class T>
+using ordered_set = tree<T,null_type,less<T>,rb_tree_tag,tree_order_statistics_node_update>;
 
 #define vv(T,a,n,...) vector<vector<T>> a(n,vector<T>(__VA_ARGS__))
 #define vvv(T,a,n,m,...) vector<vector<vector<T>>> a(n,vector<vector<T>>(m,vector<T>(__VA_ARGS__)))
@@ -53,11 +58,52 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 mt19937_64 rng64(chrono::steady_clock::now().time_since_epoch().count());
 
 void runcase(){
-    
+    int n;
+    cin >> n;
+    string s;
+    cin >> s;
+    vector<vector<int>> adj(n);
+    for(int i=0;i<n-1;i++){
+        int u,v;
+        cin >> u >> v;
+        u--,v--;
+        adj[u].eb(v);
+        adj[v].eb(u);
+    }
+    vector<int> deg(n),cnt(n);
+    for(int i=0;i<n;i++){
+        for(auto j:adj[i]){
+            deg[i]++;
+            if(s[j]=='1')cnt[j]++;
+        }
+    }
+    function<array<db,2>(int,int)> dfs=[&](int u,int p)->array<db,2> {
+        db base=0;
+        vector<db> a;
+        for(auto v:adj[u])if(v!=p){
+            auto [x,y]=dfs(v,u);
+            base+=y;
+            a.emplace_back(x-y);
+        }
+        if(s[u]=='1')return {base,base};
+        SORT(a);
+        array<db,2> res={0,0};
+        for(int t=0;t<2;t++){
+            db cur=base;
+            res[t]=cur+db(deg[u])/db(cnt[u]+t);
+            for(int i=0;i<a.size();i++){
+                cur+=a[i];
+                res[t]=min(res[t],cur+db(deg[u])/db(cnt[u]+t+i+1));
+            }
+        }
+        return res;
+    };
+    cout << dfs(0,-1)[0] << "\n";
 }
 
 int main(){
     cin.tie(nullptr)->sync_with_stdio(false);
+    cout << fixed << setprecision(20);
     int t(1);
     cin >> t;
     while(t--)runcase();

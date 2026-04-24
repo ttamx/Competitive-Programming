@@ -1,6 +1,9 @@
 #include<bits/stdc++.h>
+#include<ext/pb_ds/assoc_container.hpp>
+#include<ext/pb_ds/tree_policy.hpp>
 
 using namespace std;
+using namespace __gnu_pbds;
 
 #define pb push_back
 #define eb emplace_back
@@ -37,6 +40,8 @@ const db PI=acos(db(-1));
 
 template<class T>
 using PQ = priority_queue<T,vector<T>,greater<T>>;
+template<class T>
+using ordered_set = tree<T,null_type,less<T>,rb_tree_tag,tree_order_statistics_node_update>;
 
 #define vv(T,a,n,...) vector<vector<T>> a(n,vector<T>(__VA_ARGS__))
 #define vvv(T,a,n,m,...) vector<vector<vector<T>>> a(n,vector<vector<T>>(m,vector<T>(__VA_ARGS__)))
@@ -52,13 +57,51 @@ T SUM(const U &a){return accumulate(ALL(a),T{});}
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 mt19937_64 rng64(chrono::steady_clock::now().time_since_epoch().count());
 
-void runcase(){
-    
+const int N=3e6+5;
+const int X=5e5+5;
+const int Q=3e6+5;
+
+int n,q;
+int a[N];
+vector<pair<int,int>> divisors[X];
+vector<tuple<int,int,int>> qr[N];
+int cnt[X];
+ll ans[Q];
+
+int f(int x,int d){
+    while(x%d==0)x/=d;
+    return x;
 }
 
 int main(){
     cin.tie(nullptr)->sync_with_stdio(false);
-    int t(1);
-    cin >> t;
-    while(t--)runcase();
+    for(int i=2;i<X;i++){
+        for(int j=i;j<X;j+=i){
+            divisors[j].emplace_back(i,f(j,i));
+        }
+    }
+    cin >> n >> q;
+    for(int i=1;i<=n;i++){
+        cin >> a[i];
+    }
+    for(int i=1;i<=q;i++){
+        int l,r,k;
+        cin >> l >> r >> k;
+        l++,r++;
+        qr[r].emplace_back(i,k,+1);
+        qr[l-1].emplace_back(i,k,-1);
+    }
+    for(int i=1;i<=n;i++){
+        cnt[a[i]]++;
+        for(auto [j,x,m]:qr[i]){
+            ll res=1LL*i*x;
+            for(auto [d,v]:divisors[x]){
+                res+=1LL*cnt[d]*(v-x);
+            }
+            ans[j]+=res*m;
+        }
+    }
+    for(int i=1;i<=q;i++){
+        cout << ans[i] << "\n";
+    }
 }

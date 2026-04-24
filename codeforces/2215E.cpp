@@ -1,6 +1,9 @@
 #include<bits/stdc++.h>
+#include<ext/pb_ds/assoc_container.hpp>
+#include<ext/pb_ds/tree_policy.hpp>
 
 using namespace std;
+using namespace __gnu_pbds;
 
 #define pb push_back
 #define eb emplace_back
@@ -37,6 +40,8 @@ const db PI=acos(db(-1));
 
 template<class T>
 using PQ = priority_queue<T,vector<T>,greater<T>>;
+template<class T>
+using ordered_set = tree<T,null_type,less<T>,rb_tree_tag,tree_order_statistics_node_update>;
 
 #define vv(T,a,n,...) vector<vector<T>> a(n,vector<T>(__VA_ARGS__))
 #define vvv(T,a,n,m,...) vector<vector<vector<T>>> a(n,vector<vector<T>>(m,vector<T>(__VA_ARGS__)))
@@ -53,7 +58,37 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 mt19937_64 rng64(chrono::steady_clock::now().time_since_epoch().count());
 
 void runcase(){
-    
+    int n;
+    cin >> n;
+    vector<pair<int,int>> a(n);
+    for(auto &[x,y]:a)cin >> x >> y;
+    vector<int> ord(n);
+    iota(ALL(ord),0);
+    sort(ALL(ord),[&](int i,int j){return a[i]<a[j];});
+    vector<int> top{ord[0]},bot{ord[0]};
+    vector<tuple<int,int,int>> ans;
+    for(int i=1;i<n;i++){
+        int u=ord[i],v=ord[i-1];
+        if(a[u].se>a[v].se){
+            while(SZ(top)>=2&&a[top.back()].se<a[u].se){
+                ans.eb(u,top.back(),top.end()[-2]);
+                top.pop_back();
+            }
+            if(a[top.back()].se<a[u].se)top.pop_back();
+        }else{
+            while(SZ(bot)>=2&&a[bot.back()].se>a[u].se){
+                ans.eb(u,bot.back(),bot.end()[-2]);
+                bot.pop_back();
+            }
+            if(a[bot.back()].se>a[u].se)bot.pop_back();
+        }
+        top.eb(u);
+        bot.eb(u);
+    }
+    cout << SZ(ans) << "\n";
+    for(auto [x,y,z]:ans){
+        cout << x+1 << " " << y+1 << " " << z+1 << "\n";
+    }
 }
 
 int main(){

@@ -1,6 +1,9 @@
 #include<bits/stdc++.h>
+#include<ext/pb_ds/assoc_container.hpp>
+#include<ext/pb_ds/tree_policy.hpp>
 
 using namespace std;
+using namespace __gnu_pbds;
 
 #define pb push_back
 #define eb emplace_back
@@ -37,6 +40,8 @@ const db PI=acos(db(-1));
 
 template<class T>
 using PQ = priority_queue<T,vector<T>,greater<T>>;
+template<class T>
+using ordered_set = tree<T,null_type,less<T>,rb_tree_tag,tree_order_statistics_node_update>;
 
 #define vv(T,a,n,...) vector<vector<T>> a(n,vector<T>(__VA_ARGS__))
 #define vvv(T,a,n,m,...) vector<vector<vector<T>>> a(n,vector<vector<T>>(m,vector<T>(__VA_ARGS__)))
@@ -53,12 +58,60 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 mt19937_64 rng64(chrono::steady_clock::now().time_since_epoch().count());
 
 void runcase(){
-    
+    int n;
+    cin >> n;
+    vector<int> x1(n),x2(n),y1(n),y2(n);
+    for(int i=0;i<n;i++){
+        cin >> x1[i] >> y1[i] >> x2[i] >> y2[i];
+    }
+    auto xs=x1;xs.insert(xs.end(),ALL(x2));
+    auto ys=y1;ys.insert(ys.end(),ALL(y2));
+    SORT(xs);UNI(xs);
+    SORT(ys);UNI(ys);
+    for(auto &x:x1)x=LB(xs,x);
+    for(auto &x:x2)x=LB(xs,x);
+    for(auto &y:y1)y=LB(ys,y);
+    for(auto &y:y2)y=LB(ys,y);
+    vector<vector<int>> event(2*n);
+    for(int i=0;i<n;i++){
+        event[y1[i]].eb(i);
+    }
+    vector<int> id(2*n,-1),a(n);
+    vector<bool> bad(n);
+    for(auto &v:event){
+        for(auto i:v){
+            int val=-1;
+            for(int j=x1[i];j<x2[i];j++){
+                int k=id[j];
+                if(k!=1&&bad[k]){
+                    if(val==-1)val=a[k];
+                    if(val!=a[k]){
+                        cout << "NO\n";
+                        return;
+                    }
+                }
+            }
+            if(val==-1)val=y1[i];
+            for(int j=x1[i];j<x2[i];j++){
+                int k=id[j];
+                if(k!=-1&&!bad[k]){
+                    if(a[k]>val){
+                        cout << "NO\n";
+                        return;
+                    }
+                    bad[k]=true;
+                    a[k]=val;
+                }
+                id[j]=i;
+            }
+            a[i]=y2[i];
+        }
+    }
+    cout << "YES\n";
 }
 
 int main(){
     cin.tie(nullptr)->sync_with_stdio(false);
     int t(1);
-    cin >> t;
     while(t--)runcase();
 }
